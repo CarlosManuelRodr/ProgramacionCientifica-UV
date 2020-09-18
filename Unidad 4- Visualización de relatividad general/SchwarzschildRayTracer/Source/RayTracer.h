@@ -1,4 +1,5 @@
 #pragma once
+#include <cfloat>
 #include "Sphere.h"
 #include "HitableList.h"
 #include "Camera.h"

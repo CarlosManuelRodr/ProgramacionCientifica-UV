@@ -39,7 +39,7 @@ int s_unlink_cb(const char* fpath, const struct stat* sb, int typeflag, struct F
 * @brief Borra ruta recursivamente.
 * @param path Ruta a borrar.
 */
-int s_rmrf(string path)
+int s_rmrf(std::string path)
 {
     return nftw(path.c_str(), s_unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
@@ -86,7 +86,7 @@ std::string replace_all(const std::string& in, const std::string& search, const 
 std::string s_format_path(const std::string in, bool support_long_path = false)
 {
 #if defined(__linux__) || defined(__APPLE__)
-    return string(in);
+    return std::string(in);
 #elif defined(_WIN32)
     std::string out(in);
     replace_all(out, "/", "\\");
@@ -195,11 +195,11 @@ bool file_exist(std::string fileName)
 std::string get_app_folder()
 {
 #if defined(__linux__)
-    string path = "";
+    std::string path = "";
     pid_t pid = getpid();
     char buf[20] = { 0 };
     sprintf(buf, "%d", pid);
-    string _link = "/proc/";
+    std::string _link = "/proc/";
     _link.append(buf);
     _link.append("/exe");
     char proc[512];
@@ -236,7 +236,7 @@ void create_directory(std::string directory_name)
 {
     std::string path = get_app_folder() + filesystemSeparator + directory_name;
 #if defined(__linux__) || defined(__APPLE__)
-    if (df_directory_exist(path))
+    if (directory_exist(path))
         s_rmrf(path);
 #endif
     s_mkdir(path);
