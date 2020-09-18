@@ -1,0 +1,91 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+ 
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.apk
+ 
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# IDE #
+#######
+*.suo
+*.mid
+*.sdf
+*.opensdf
+ 
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build directories #
+#####################
+bin/
+dist/
+build/
+.buildozer/
+/Debug/
+/Release/
+/x64/
+/build-FreewayAC-Desktop-Debug/
+/build-FreewayAC-Desktop-Release/
+/ipch/
+/FreewayAC/Debug/
+/FreewayAC/Release/
+/FreewayAC/x64/
+/FreewayAC_tests/Debug/
+/FreewayAC_tests/Release/
+/FreewayAC_tests/x64/
+
+#  Application files #
+######################
+/.vs/
+/Release/
+/obj/
+/tmp/
+/bin/
+/Debug/
+/Release/
+/Release/
+/Release/
+/Resultados/
+/FreewayAC/*.bmp
+/FreewayAC/*.csv
+/scripts/Autonomous/
+/scripts/Circular/
+/scripts/Open/
+/scripts/Semaphore/
+/scripts/SimpleJunction/
+/scripts/Stop/
+/scripts/MultilaneCircular/
+/cmake-build-debug/
+/cmake-build-release/
+/.idea/
+/MathematicaLink/obj/maintm.c

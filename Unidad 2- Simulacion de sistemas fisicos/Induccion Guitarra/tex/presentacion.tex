@@ -1,0 +1,525 @@
+\documentclass[10pt, xcolor=dvipsnames]{beamer} 
+\usepackage[spanish,mexico]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usecolortheme[named=Green]{structure} 
+\usetheme{Malmoe} 
+
+\newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}%
+\newcommand*{\Resize}[2]{\resizebox{#1}{!}{$#2$}}%
+
+%\setbeamertemplate{items}[ball] 
+%\setbeamertemplate{blocks}[rounded][shadow=true] 
+\setbeamertemplate{navigation symbols}{}
+\author{Carlos Manuel Rodríguez y Martínez}
+\institute{Universidad Veracruzana}
+\title{Inducción de la señal EM en las pastillas de guitarra eléctrica}
+\subtitle{Proyecto de electromagnetismo}
+\date{\today}
+\begin{document}
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Objetivo y Contenido}
+  \begin{block}{Objetivo}
+  \begin{itemize}
+    \item Mostrar y discutir el funcionamiento de una pastilla para guitarra eléctrica
+    \end{itemize}    
+  \end{block}
+  \begin{block}{Distribución de la presentación}
+      \begin{itemize}
+      \item Historia
+      \item Pastillas, componentes, discusión cualitativa
+      \item Maneras de modelar el problema, modelo microscópico
+      \item Modelo realista y análisis de Fourier
+      \end{itemize}    
+  \end{block}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  \begin{center}
+    \Huge Acerca del instrumento
+  \end{center}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Historia}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Las primeras pastillas...}
+        \begin{itemize}      
+        \item Se experimentaba con micrófonos desde los 20's
+        \item La necesidad fue evidente en la era de las \emph{Big Bands}        
+        \item La sección de metales apagaba las guitarras
+        \item Les Paul eliminó problemas de \emph{feedback} usando guitarras de cuerpo sólido
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.6]{img/sarten_rickenbacker.jpg}
+        \caption{1931: Rickenbacker \emph{Frying Pan}}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Primeras guitarras}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}        
+        \includegraphics[scale=0.75]{img/lespaul.jpg}
+        \caption{Les Paul en vivo}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.35]{img/lespaul2.jpg}
+        \caption{Guitarras Les Paul}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Tipos de pastillas}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}        
+        \includegraphics[scale=0.4]{img/singlecoil1.jpg}\\
+        \includegraphics[scale=0.4]{img/singlecoil2.jpg}
+        \caption{Single coils}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.4]{img/humbucker1.jpg}\\
+        \includegraphics[scale=0.4]{img/humbucker2.jpg}
+        \caption{Humbuckers}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Componentes}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Una bobina con vueltas en el orden de $10^3$
+        \item Núcleos ferromagnéticos
+        \item Imán en la base
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.3]{img/diagrama_pastilla.jpg}
+        \caption{Componentes}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Componentes}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}        
+        \includegraphics[scale=0.3]{img/corte_pastilla.jpg}
+        \caption{Corte transversal}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Las cuerdas oscilando en el campo magnético \emph{inducen} una corriente en el embobinado
+        \item Los núcleos aumentan el flujo magnético a través de la pastilla
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Interacción con la cuerda}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item La cuerda (ferromagneto) oscila en el campo magnético
+        \item Se induce una corriente alterna con frecuencia idéntica
+        \item La señal es procesada y amplificada en circuitos externos
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.3]{img/interaccion.jpg}
+        \caption{Componentes}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  \begin{center}
+    \Huge Modelos
+  \end{center}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Sobre los modelos teóricos}
+  \begin{itemize}
+    \item Se pueden utilizar los campos de solenoides rectos finitos para modelar los imanes de las pastillas (N. G. Horton, T. R. Moore)
+      \begin{itemize}
+      \item Es matemáticamente complicado
+      \item No aporta más información física acerca del problema que los demás métodos.
+      \end{itemize}
+    \item Se pueden modelar estas barras como simples dipolos (licenciatura)
+      \begin{itemize}
+      \item Mucho más sencilla de utilizar
+      \item Válida en las regiones de interés (fuera del imán)
+      \end{itemize}
+    \item Campo magnético de cuerda vibrante en campo externo constante.
+    \item Modelos realistas requieren soluciones numéricas (simulación)
+  \end{itemize}
+
+  \begin{figure}
+    \begin{align*}
+      \mathbf{B} = \frac{\mu_0}{4\pi}\left[\frac{\left(3\mathbf{m}\cdot\mathbf{\hat r}\right)\mathbf{\hat r} - \mathbf{m}}{r^3}\right]
+    \end{align*}
+    \caption{Aproximación dipolar}
+  \end{figure}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Modelo microscópico}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Suponemos una cuerda compuesta por dipolos magnéticos
+        \item El campo magnético de la pastilla alinea estos dipolos
+        \item Se induce una corriente en la bobina debida al cambio en el flujo magnético en ella
+        \item Se establece una $\Delta V$ que alimenta una señal hacia un amplificador
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.15]{img/ModeloDip.png}
+        \caption{Modelo microscópico del sistema}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Campo magnético producido}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Consideremos la interacción entre un dipolo de la cuerda y el imán
+        \item Al moverse la cuerda se genera un campo magnético variable
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.32]{img/CampoMag.jpeg}
+        \caption{Campo magnético de dos dipolos (principio de super-posición)}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+{\scriptsize
+\begin{align*}
+  \mathbf{B} = \frac{\mu_0}{4\pi}&\left\{\frac{3\left[(\mathbf{m_1}\cdot(\mathbf{r} - \mathbf{r_1})\right](\mathbf{r} - \mathbf{r_1})}{|\mathbf{r} - \mathbf{r_1}|^5} + \frac{3\left[(\mathbf{m_2}\cdot(\mathbf{r} - \mathbf{r_2})\right](\mathbf{r} - \mathbf{r_1})}{|\mathbf{r} - \mathbf{r_2}|^5} - \frac{\mathbf{m_1}}{|\mathbf{r} - \mathbf{r_1}|^3} - \frac{\mathbf{m_2}}{|\mathbf{r} - \mathbf{r_2}|^3}\right\}
+\end{align*}
+}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Señal inducida}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}        
+        \includegraphics[scale=0.33]{img/Signal1.png}
+        \caption{Señal inducida cuando r es pequeña}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.33]{img/Signal2.png}
+        \caption{Señal inducida cuando r es grande}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+  \begin{align*}
+  	\xi = - \frac{3 \mu_0}{2} \frac{m_2 a^2}{A^3} \frac{A \cos t}{\left( r + A \sen t \right)^4}
+  \end{align*}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Un modelo más realista}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Se supondrá que la cuerda está inmersa en un campo magnético constante $B_0$ que permea todo el espacio.
+        \item Al moverse la cuerda modifica el campo magnético.
+        \item El flujo de este campo magnético modificado se induce en el solenoide.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.25]{img/Diagrama.png}
+        \caption{Diagrama del sistema}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  \begin{itemize}
+  \item Se parte de la suposición de que no hay corriente en la cuerda (material conductor), entonces $\nabla \times \vec{H} = 0$.
+  \item El campo magnético se puede expresar en términos de un potencial escalar $\vec{H} = - \nabla \phi_m$.
+  \item El campo magnético que proviene del imán es
+  \[
+  	\vec{H_0} = \frac{B_0}{\mu_0} \hat{j} = - \nabla \frac{- B_0 r \sin \theta}{\mu_0}.
+  \]
+  \end{itemize}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  Nos interesa el campo magnético de se genera de la interacción con la cuerda, se resuelve la ecuación de Laplace en coordenadas cilíndricas (por la geometría de la cuerda). El potencial no depende de $z$, se usa una forma conveniente de la solución a la ecuación de Laplace.
+  \[
+  	\phi_m(r, \theta) = A + B \operatorname{ln}(r) + \sum_{n=0}^\infty \left( A_n r^n \sin (n \theta) + B_n r^n \cos (n \theta) + C_n r^{-n} \sin (n \theta) \right.
+  \]
+  \[
+  		\left. + D_n r^{-n} \cos (n \theta) \right)
+  \]
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Caso $r > a$}
+  \begin{itemize}
+  \item No hay dependencia de los términos $\cos$.
+  \item Al hacer $r \to \infty$ el campo que se observa es $H_0$.
+  \item En la frontera $r=a$ el potencial es cero.
+  \item A partir de estas condiciones el potencial se puede expresar como
+  \[
+  	\phi_m (r, \theta) = - \frac{B_0 r}{\mu_0} \sin \theta + \alpha \frac{a}{r} \sin \theta.
+  \]
+  \end{itemize}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Caso $r < a$}
+  \begin{itemize}
+  \item No puede diverger en $r=0$.
+  \item No tiene dependencia de los términos $\cos$.
+  \item Sujeto a condiciones de frontera.
+  \item A partir de estas condiciones el potencial se puede expresar como
+  \[
+  	\phi_m (r, \theta) = - \frac{B_0 r}{\mu_0} \sin \theta + \alpha \frac{r}{a} \sin \theta.
+  \]
+  \end{itemize}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  El campo magnético normal a la superficie debe cumplir la condición de continuidad
+  \[
+  	B_r(r = a^{-}) = B_r(r = a^+),
+  \]
+  donde
+  \[
+  	B_r(r = a^-) = \mu_r \mu_0 H_r(r = a^-) = - \mu_r \mu_0 \left. \frac{\partial \phi_m}{\partial r} \right|_{r=a^-} = \left(B_0 - \frac{\mu_0 \alpha}{a} \right) \mu_r \sin \theta.
+  \]
+  y
+  \[
+  	B_r(r = a^+) = \mu_0 H_r(r = a^+) = - \mu_0 \left. \frac{\partial \phi_m}{\partial r} \right|_{r=a^+} = \left(B_0 + \frac{\mu_0 \alpha}{a} \right) \sin \theta.
+  \]
+  $\mu_r$ es la permeabilidad relativa de la cuerda.
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  Con esta condición de continuidad se obtiene el valor de $\alpha$,
+  \[
+  	\alpha = \frac{a B_0}{\mu_0} \frac{\mu_r - 1}{\mu_r + 1}.
+  \]
+  Al sustituir en la expresión para el potencial en el caso $r > a$ queda
+  \[
+  	\phi_m(r, \theta) = - \frac{B_0}{\mu_0} \left(r - \frac{a^2}{r} \frac{\mu_r - 1}{\mu_r + 1} \right) \sin \theta.
+  \]
+  A partir de aquí se obtiene el campo eléctrico radial y angular.
+  \[
+  	B_r(r, \theta) = - \mu_0 \frac{\partial \phi}{\partial r} = B_0 \left(1+\frac{a^2}{r^2} \frac{\mu_r - 1}{\mu_r + 1} \right) \sin \theta,
+  \]
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  y
+  \[
+  	B_\theta (r, \theta) = - \frac{\mu_0}{r} \frac{\partial \phi}{\partial \theta} = B_0 \left(1 - \frac{a^2}{r^2} \frac{\mu_r - 1}{\mu_r+1} \right) \cos \theta.
+  \]
+  Como se desea calcular el campo magnético en la bobina se necesita el campo en dirección $y$.
+  \[
+  	B_y (x, y) = B_r \sin \theta + B_\theta \cos \theta = B_0 \left( 1 + a^2 \frac{\mu_r - 1}{\mu_r+1} \frac{y^2 - x^2}{(x^2 + y^2)^2} \right)
+  \]
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Regresando al diagrama}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Se ubica a la bobina en la posición $(x_b, y_b)$.
+        \item Se utilizará una bobina cuadrada que se extiende des de $x_b - \frac{L}{2}$ a $x_b - \frac{L}{2}$.
+        \item La bobina tiene una separación $h$ de la cuerda en reposo.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.25]{img/Diagrama2.png}
+        \caption{Diagrama del sistema}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  el flujo magnético en la bobina es
+  \[
+  	\Phi = \int \int \vec{B} \cdot d \vec{s} = L \int_{x_b-\frac{L}{2}}^{x_b + \frac{L}{2}} B_y(x, y_b) \, dx
+  \]
+  \[
+  	= B_0 L \left( L + a^2 \frac{\mu_r - 1}{\mu_r+1} \left( \frac{x_b + \frac{L}{2}}{ \left(x_b + \frac{L}{2} \right)^2 + y_b} - \frac{x_b - \frac{L}{2}}{ \left(x_b - \frac{L}{2} \right)^2 + y_b} \right) \right).
+  \]
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  Por conveniencia se pasa al sistema de referencia de la bobina, donde $x_b = x$, y $y_b = y + h$.
+  \[
+  	\Phi= B_0 L \left( L + a^2 \frac{\mu_r - 1}{\mu_r+1} \frac{(y+h)^2 - x^2 + \frac{L^2}{4}}{\left(x^2 - \frac{L^4}{4} \right)^2 + 2\left(x^2 + \frac{L^2}{4} \right)(y+h)^2 + (y+h)^4} \right),
+  \]
+  entonces el voltaje que se induce en la bobina es
+  \small
+  \[\Scale[0.8]{
+  	V(t) = - \frac{d \Phi}{d t} = B_0 a^2 L^2 \frac{\mu_r - 1}{\mu_r+1} \left( \frac{2 x \dot{x} (3(y+h)^4 + 2(x^2 + L^2/4)(y+h)^2 - (x^2 - L^2/4)^2) + \dot{y}(2(y+h)^5 - 4(x^2 - L^2/4)(y+h)^3 + (6x^4 - x^2 L^2/2 - L^4/8)}{((x^2-L^2/4)^2 + 2(x^2 + L^2/4)(y+h)^2 + (y+h)^4} \right)}
+  \]
+  \[
+  	\approx B_0 a^2 L^2 \frac{\mu_r - 1}{\mu_r+1} \left( 2 x \dot{x} \frac{3h^2 - L^2/4}{(h^2 + L^2/4)^3} + \frac{2 h \dot{y}}{(h^2 + L^2/4)^2} \right)
+  \]
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  \begin{center}
+    \Huge Resultados
+  \end{center}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Señal: $\sin$ y $\cos$}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Con $x(t) = \cos(440 \times 2 \pi t)$, y $y(t) = \sin(440 \times 2 \pi t)$.
+        \item A partir de la gráfica no se observa la gran diferencia.
+      \end{itemize}
+      \begin{figure}
+        \includegraphics[scale=0.33]{img/Signal.png}
+        \caption{Señales}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+    \begin{itemize}
+        \item Para observar más a fondo conviene realizar un análisis de Fourier.
+        \begin{figure}
+        \includegraphics[scale=0.28]{img/xs.png}
+        \caption{Señal en $x(t)$.}
+        \end{figure}
+     	\item La transformada de Fourier Discreta da como resultado,
+     	\begin{figure}
+        \includegraphics[scale=0.28]{img/xf.png}
+        \caption{Transformada de Fourier de $x(t)$.}
+        \end{figure}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Señal: $\sin$ y $\cos$}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+        \begin{itemize}
+        \item En $y$ se obtiene un resultado similar.
+        \begin{figure}
+        \includegraphics[scale=0.28]{img/ys.png}
+        \caption{Señal en $y(t)$.}
+        \end{figure}
+     	\item La transformada de Fourier Discreta da como resultado,
+     	\begin{figure}
+        \includegraphics[scale=0.28]{img/yf.png}
+        \caption{Transformada de Fourier de $y(t)$.}
+        \end{figure}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+        \begin{itemize}
+        \item El resultado interesante se observa de la transformada de $V(t)$.
+        \begin{figure}
+        \includegraphics[scale=0.28]{img/is.png}
+        \caption{Señal en $V(t)$.}
+        \end{figure}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+%-----------------------------------------------------------------------------
+\begin{frame}
+  \begin{center}
+    \Huge Conclusiones
+  \end{center}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Conclusiones}
+  \begin{block}{}
+    \begin{itemize}
+      \item Una pastilla es sensible a las variaciones en el flujo magnético a través de ella
+      \item La frecuencia de la oscilación en cada eje determina la frecuencia de la corriente
+      \item El mecanismo de la guitarra eléctrica induce armónicos extra que son la causa de su sonido característico.
+      \item Podemos utilizar las ecuaciones obtenidas de modelar el mecanismo para recrear los sonidos que generarían otros instrumentos similares.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+%-----------------------------------------------------------------------------
+\begin{frame}{Referencias}
+  \begin{block}{Referencias}
+    \begin{itemize}
+      \item[1] J. Reitz, F. Milford, \emph{Foundations of Electromagnetic Theory} (1ra ed., Addison-Wesley, Massachusetts, 1960).
+      \item[2] N. Horton, T. Moore, \emph{Modelling the magnetic pickup of an electric guitar} Am. J. Phys. \textbf{77 (2)}, 144-150 (2009).
+      \item[3] F. Ban, \emph{Analysis of Electric Guitar Pick-ups} Graduate Student, Penn State University.
+      \item[4] K. T. McDonald, \emph{Electric Guitar Pickups} Joseph Henry Laboratories, Princenton University, Princenton, NJ 08544.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\end{document}
