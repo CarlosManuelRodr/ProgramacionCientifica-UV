@@ -1,7 +1,7 @@
 # ProgramacionCientifica-UV
 Repositorio del curso de Programación Científica de la Maestría en Física UV
 
-##Material del curso 
+## Material del curso 
 
 El material con el que se trabajará durante el curso se encuentra en este repositorio público.
 
@@ -9,7 +9,7 @@ Se recomienda a los estudiantes clonar el repositorio mediante una herramienta b
 
  
 
-##Temario 
+## Temario 
 
 - Unidad 1- Arquitectura, Ensamblador y Compiladores 
 - Unidad 2- Simulación de sistemas físicos 
@@ -19,13 +19,13 @@ Se recomienda a los estudiantes clonar el repositorio mediante una herramienta b
 
  
 
-##Evaluación 
+## Evaluación 
 
 La evaluación se realizará a través de tareas y proyectos. Para los alumnos que toman el curso desde el programa de maestría la calificación se calcula tomando como puntaje 70% de tareas y 30% de proyectos. Para los alumnos que toman el curso desde licenciatura el puntaje consiste en 100% de tareas. 
 
  
 
-##Reglas 
+## Reglas 
 
 - Asistir a la clase con la cámara encendida (para que no se pierdan necesito ver si hay dudas en su corazón). 
 
