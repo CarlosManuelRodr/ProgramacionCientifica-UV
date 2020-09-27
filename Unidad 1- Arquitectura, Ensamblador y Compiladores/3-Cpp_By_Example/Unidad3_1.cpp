@@ -9,20 +9,20 @@ using namespace std;
 
 int main()
 {
-	int numero;
-	cout << "Introduce el numero 2: ";
-	cin >> numero;
+    int numero;
+    cout << "Introduce el numero 2: ";
+    cin >> numero;
 
-	if (numero == 2)
-	{
-		cout << "Bien, el numero es 2." << endl;
-	}
-	else
-	{
-		cout << "Estupido! El numero no es 2." << endl;
-	}
+    if (numero == 2)
+    {
+        cout << "Bien, el numero es 2." << endl;
+    }
+    else
+    {
+        cout << "Estupido! El numero no es 2." << endl;
+    }
 
-	return 0;
+    return 0;
 }
 
 /* Ejercicio: Crear un programa que pida al usuario un número entero y diga si es par (pista: habrá

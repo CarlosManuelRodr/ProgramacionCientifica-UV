@@ -9,22 +9,22 @@ using namespace std;
 
 int main()
 {
-	int numero = 0;
-	
-	while (numero != 2)
-	{
-		cout << "Introduzca el numero 2: ";
-		cin >> numero;
+    int numero = 0;
+    
+    while (numero != 2)
+    {
+        cout << "Introduzca el numero 2: ";
+        cin >> numero;
 
-		if (numero == 2)
-		{
-			cout << "Correcto." << endl;
-		}
-		else
-		{	
-			cout << "No, idiota! Te dije que el numero 2. " << endl;
-		}
-	}
+        if (numero == 2)
+        {
+            cout << "Correcto." << endl;
+        }
+        else
+        {    
+            cout << "No, idiota! Te dije que el numero 2. " << endl;
+        }
+    }
 
-	return 0;
+    return 0;
 }

@@ -23,4 +23,4 @@ int main()
     return 0;
 }
 
-/* Ejercicio: Graficar la convergencia del método de Newton-Raphson para la ecuacion f(x) = cos(x) - x. */
+/* Ejercicio: Graficar la función f(x) = Log(x). */

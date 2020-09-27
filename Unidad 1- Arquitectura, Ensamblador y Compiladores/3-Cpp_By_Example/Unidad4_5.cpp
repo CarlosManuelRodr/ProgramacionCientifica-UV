@@ -146,3 +146,8 @@ int main()
     DibujaMandelbrotColor();
     return 0;
 }
+
+/*
+   Ejercicio 1: Hacer un mapa del conjunto de Julia con un parámetro c especificado por el usuario.
+   Ejercicio 2: Hacer un mapa de la convergencia del método de Newton-Raphson para la ecuación f(z) = z^3 - 1.
+*/

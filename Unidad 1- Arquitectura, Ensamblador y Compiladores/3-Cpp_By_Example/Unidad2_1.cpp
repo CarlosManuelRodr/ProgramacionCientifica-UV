@@ -21,16 +21,16 @@ a * b
 
 void pendeja()
 {
-	cout << "Valgo verga" << enteroGlobal << endl;
+    cout << "Valgo verga" << enteroGlobal << endl;
 }
 
 int main()
 {
-	// Espacio local. Solo disponible dentro de las funciones.
-	int enteroLocal = 23;
-	float floatLocal = 4.87;
-	
-	cout << "El numero entero es: " << enteroLocal << endl;
-	cout << "El numero flotante es: " << floatLocal << endl;
-	return 0;
+    // Espacio local. Solo disponible dentro de las funciones.
+    int enteroLocal = 23;
+    float floatLocal = 4.87;
+    
+    cout << "El numero entero es: " << enteroLocal << endl;
+    cout << "El numero flotante es: " << floatLocal << endl;
+    return 0;
 }

@@ -10,20 +10,20 @@ using namespace std;
 
 int main()
 {
-	/* Si se quiere aumentar la variable "i" en una unidad se puede
-	   usar i = i + 1, o i++ */
+    /* Si se quiere aumentar la variable "i" en una unidad se puede
+       usar i = i + 1, o i++ */
 
-	for (int i=1; i<=10; i++)
-	{
-		if (i == 5) continue; // "continue" permite saltarse la ejecucion de un bucle. 
-		cout << i << endl;
-	}
+    for (int i=1; i<=10; i++)
+    {
+        if (i == 5) continue; // "continue" permite saltarse la ejecucion de un bucle. 
+        cout << i << endl;
+    }
 
-	return 0;
+    return 0;
 }
 
 /* Ejercicio: Crear un programa que escriba en pantalla los números del 1 al 50 que sean múltiplos
-de 3 (pista: habrá que recorrer todos esos números y ver si el resto de la división entre
-3 resulta 0). */
+de 3 (pista: habrá que recorrer todos esos números y ver si el residuo de la división entre
+3 resulta 0). Tip: Se puede calcular el residuo con el operador mod %.*/
 
 

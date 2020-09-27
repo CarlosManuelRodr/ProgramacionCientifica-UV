@@ -17,20 +17,20 @@ using namespace std;
 
 int main()
 {
-	int numero;
-	cout << "Introduzca un numero: ";
-	cin >> numero;
+    int numero;
+    cout << "Introduzca un numero: ";
+    cin >> numero;
 
-	if(numero > 2)
-	{
-		cout << "El numero es mayor que 2" << endl;
-	}
-	if(numero != 2)
-	{
-		cout << "El numero es diferente a 2" << endl;
-	}
+    if(numero > 2)
+    {
+        cout << "El numero es mayor que 2" << endl;
+    }
+    if(numero != 2)
+    {
+        cout << "El numero es diferente a 2" << endl;
+    }
 
-	return 0;
+    return 0;
 }
 
 /* Ejercicio: Se pueden encadenar varias operaciones logicas en un solo if.
@@ -41,7 +41,7 @@ Operador  Significado
 !          No
 
 Un ejemplo seria: if((numero > 2) && (numero == 4))
-Hacer que el programa del ejercicio anterior solo verifique numeros positivos.
+Hacer un programa donde el usuario introduzca un número, y el programa debe indicar si es positivo o negativo.
 
 */
 
