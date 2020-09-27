@@ -2,9 +2,18 @@
 #include <fstream>
 #include <cstdint>
 #include <vector>
+#include <string>
 #include "Matrix.h"
+#include "OptionParser.h"
 using namespace std;
 
+/****************************
+*                           *
+*      Virtual Machine      *
+*                           *
+****************************/
+
+// List of available instructions
 enum class MachineInstructions
 {
     LoadA,
@@ -110,6 +119,7 @@ uint16_t read_uint16(istream& file)
 
 vector<uint16_t> load_executable(string path)
 {
+    // Load the executable into a vector of uint16_t by reading in 16-bit chunks
     ifstream machineCodeFile(path, ios::in | ios::binary);
 
     if (machineCodeFile.is_open())
@@ -290,157 +300,113 @@ public:
             aluParityFlag = false;
     }
 
+    ///@brief Perform one CPU cycle by processing the current instruction.
     void PerformCycle()
     {
+        // Get instruction and parameter from RAM
         instructionRegister = ram[addressRegister];
         parameterRegister = ram[addressRegister + 1];
 
+        // Transform the content of instructionRegister to a MachineInstruction
         MachineInstructions currentInstruction = static_cast<MachineInstructions>(instructionRegister);
 
+        // Execute instruction
+        // Homework: Fill the behavior of each instruction
         switch (currentInstruction)
         {
             case MachineInstructions::LoadA:
             {
-                registerA = ram[parameterRegister];
-                this->UpdateALU();
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::LoadB:
             {
-                registerB = ram[parameterRegister];
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::SetA:
             {
-                registerA = parameterRegister;
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::SetB:
             {
-                registerB = parameterRegister;
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Store:
             {
-                ram[parameterRegister] = registerA;
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Add:
             {
-                int16_t sum = registerA + registerB;
-                registerA = sum;
-                this->UpdateALU(sum);
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Substract:
             {
-                int16_t sub = registerA - registerB;
-                registerA = sub;
-                this->UpdateALU(sub);
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Increment:
             {
-                int16_t sum = registerA + 1;
-                registerA = sum;
-                this->UpdateALU(sum);
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Decrement:
             {
-                int16_t sub = registerA - 1;
-                registerA = sub;
-                this->UpdateALU(sub);
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Jump:
             {
-                addressRegister = parameterRegister;
+
             }
             break;
             case MachineInstructions::JumpPos:
             {
-                if (aluPositiveFlag)
-                    addressRegister = parameterRegister;
-                else
-                    addressRegister += 2;
+
             }
             break;
             case MachineInstructions::JumpNeg:
             {
-                if (aluNegativeFlag)
-                    addressRegister = parameterRegister;
-                else
-                    addressRegister += 2;
+
             }
             break;
             case MachineInstructions::JumpZero:
             {
-                if (aluZeroFlag)
-                    addressRegister = parameterRegister;
-                else
-                    addressRegister += 2;
+
             }
             break;
             case MachineInstructions::JumpNotZero:
             {
-                if (aluNotZeroFlag)
-                    addressRegister = parameterRegister;
-                else
-                    addressRegister += 2;
+
             }
             break;
             case MachineInstructions::JumpOdd:
             {
-                if (aluParityFlag)
-                    addressRegister = parameterRegister;
-                else
-                    addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Call:
             {
-                stack[stackPointerRegister] = addressRegister;
-                stackPointerRegister++;
-                addressRegister = parameterRegister;
+
             }
             break;
             case MachineInstructions::Return:
             {
-                if (stackPointerRegister == 0)
-                    halted = true;
-                else
-                {
-                    stackPointerRegister--;
-                    addressRegister = stack[stackPointerRegister];
-                    stack[stackPointerRegister] = 0;
-                    addressRegister += 2;
-                }
+
             }
             break;
             case MachineInstructions::Print:
             {
-                textBuffer.push_back(ram[parameterRegister]);
-                addressRegister += 2;
+
             }
             break;
             case MachineInstructions::Draw:
             {
-                uint16_t row = registerA;
-                uint16_t col = registerB;
-                bool color = static_cast<bool>(ram[parameterRegister]);
 
-                imageBuffer[row][col] = color;
-                addressRegister += 2;
             }
             break;
             default:
@@ -450,6 +416,53 @@ public:
 
 
 };
+
+/****************************
+*                           *
+*       Option Parser       *
+*                           *
+****************************/
+
+struct Arg : public option::Arg
+{
+    static void PrintError(const char* msg1, const option::Option& opt, const char* msg2)
+    {
+#if defined(_WIN32)
+        fprintf(stderr, "%s", msg1);
+        fwrite(opt.name, opt.namelen, 1, stderr);
+        fprintf(stderr, "%s", msg2);
+#endif
+    }
+
+    static option::ArgStatus Required(const option::Option& option, bool msg)
+    {
+        if (option.arg != 0)
+            return option::ARG_OK;
+
+        if (msg) PrintError("Opcion '", option, "' requiere un argumento.\n");
+        return option::ARG_ILLEGAL;
+    }
+};
+
+enum  OptionIndex {
+    UNKNOWN, INPUT_FILE, VIEW_EXECUTION, VIEW_INTERVAL , HELP
+};
+
+const option::Descriptor usage[] =
+{
+    {UNKNOWN, 0, "", "",Arg::None, "INSTRUCTIONS: VirtualCPU [options]\n"},
+    {INPUT_FILE,  0,"i", "input_file", Arg::Required, "  -i <path>, \t--input_file=<path>  \tPath to executable." },
+    {VIEW_EXECUTION,  0,"v","view_execution", Arg::None,"  -v , \t--view_execution  \tShow status of each execution cycle." },
+    {VIEW_INTERVAL,  0, "c", "view_interval", Arg::Required, "  -c <num>, \t--view_interval=<num>  \tCPU cycles between every execution view." },
+    {HELP, 0,"", "help", Arg::None,    "  \t--help  \tShow instructions." },
+    {0,0,0,0,0,0}
+};
+
+/****************************
+*                           *
+*    Terminal Functions     *
+*                           *
+****************************/
 
 void pause()
 {
@@ -469,21 +482,76 @@ void clear_screen()
 #endif
 }
 
-int main()
-{
-    VirtualCPU cpu;
-    cpu.LoadExecutableFromFile("rule90.vme");
+/****************************
+*                           *
+*       Main Program        *
+*                           *
+****************************/
 
-    for (int i = 0; i < 20000; i++)
+int main(int argc, char* argv[])
+{
+    // Default parameters
+    string inputFile;
+    bool viewExecution = false;
+    int viewInterval = 1;
+
+    // Execute argument parser
+    argc -= (argc > 0); argv += (argc > 0);
+    option::Stats  stats(usage, argc, argv);
+    option::Option* options = new option::Option[stats.options_max];
+    option::Option* buffer = new option::Option[stats.buffer_max];
+    option::Parser parse(usage, argc, argv, options, buffer);
+
+    // Process argument parser options
+    if (parse.error())
+        return 1;
+
+    if (options[HELP] || argc == 0)
+    {
+        option::printUsage(cout, usage);
+        return 0;
+    }
+
+    for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
+        cout << "Invalid option: " << opt->name << "\n";
+
+    for (int i = 0; i < parse.optionsCount(); ++i)
+    {
+        option::Option& opt = buffer[i];
+        switch (opt.index())
+        {
+        case INPUT_FILE:
+            inputFile = opt.arg;
+            break;
+        case VIEW_EXECUTION:
+            viewExecution = true;
+            break;
+        case VIEW_INTERVAL:
+            viewInterval = stoi(opt.arg);
+            break;
+        }
+    }
+
+    delete[] options;
+    delete[] buffer;
+
+    // Start VirtualCPU execution
+    VirtualCPU cpu;
+    cpu.LoadExecutableFromFile(inputFile);
+
+    int i = 0;
+    while (!cpu.IsHalted())
     {
         cpu.PerformCycle();
-        if (i % 1000 == 0)
+        if (viewExecution && (i % viewInterval == 0))
         {
             cpu.DrawRegistersStatus();
             cpu.DrawBuffersOutput();
             pause();
             clear_screen();
         }
+
+        i++;
     }
 
     cpu.DrawRegistersStatus();

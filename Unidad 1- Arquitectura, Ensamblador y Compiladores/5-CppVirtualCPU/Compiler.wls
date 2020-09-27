@@ -1,6 +1,35 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
+(* ::Title:: *)
+(*PL/0 Compiler*)
+
+
+(* ::Chapter:: *)
+(*Initialization*)
+
+
+(* ::Section:: *)
+(*Finite state machine*)
+
+
+(* ::Subsection:: *)
+(*Deterministic finite automaton (DFA)*)
+
+
+(* ::Text:: *)
+(*DFA[name, transitions, start, accept, stateExpr] create an DFA from a transition list.*)
+(*DFATransitions[transitions, state]*)
+(*DFAIterate[transitions, state, inputSymbol] get the next step in the computation of the DFA for a inputSymbol.*)
+(*DFACompute[dfa, inputString] compute if input is recognized by dfa.*)
+(*FiniteAutomataPlot[fa] return a plot of the finite automata represented by fa.*)
+(*DFAExecutionPlot[dfa, inputString] return a dynamic execution plot of the computation performed by dfa.*)
+
+
+(* ::Subsection:: *)
+(*DFA Implementation*)
+
+
 (* ::Input::Initialization:: *)
 Protect[\[Epsilon]]; (* \[Epsilon] will be used as a symbol to denote the empty string *)
 Transition[parent_,child_,inputSymbol_]:=<|"Parent"->parent,"Node"->child,"InputSymbol"->inputSymbol|>;
@@ -91,6 +120,10 @@ Return[{computation,result}]
 ];
 
 
+(* ::Text:: *)
+(*Plotting functions*)
+
+
 (* ::Input::Initialization:: *)
 Options[DFAExecutionPlot] = {"SimpleNodes"->False};
 DFAExecutionPlot[dfa_Association,inputString_,OptionsPattern[]]:=DynamicModule[{trace,executionSteps,ruleIndexes,graphData,startTag,acceptTags},
@@ -126,6 +159,30 @@ VertexSize->0.1
 {i,1,Length[ruleIndexes],1}
 ]
 ];
+
+
+(* ::Subsection:: *)
+(*Non-deterministic Finite Automata (NFA)*)
+
+
+(* ::Text:: *)
+(*NFA[name, transitions, start, accept, stateExpr] create an NFA from a transition list.*)
+(*NFAIterate[transitions, state, inputSymbol] get the next step in the computation of the NFA for a inputSymbol.*)
+(*NFACompute[nfa, inputString] compute if input is recognized by nfa.*)
+(**)
+(*NFASimplify[nfa] tries to simplify the structure of nfa by removing unnecesary nodes.*)
+(*NFAUnion[nfa1, nfa2] perform the regular operation union.*)
+(*NFAConcatention[nfa1, nfa2] perform the regular operation concatenation.*)
+(*NFAStar[fa] perform the regular operation kleene star.*)
+(*NFAToDFA[nfa] convert a NFA to a DFA by traversing every posible computation and transforming group of NFA states into a single DFA state.*)
+(**)
+(*NFAExecutionTreeComputeTrace[nfa, inputString] return the trace of the computation performed by nfa.*)
+(*NFAExecutionTree[nfa, inputString] return the execution tree of the computation performed by nfa.*)
+(*NFAExecutionPlot[nfa, inputString] return a dynamic execution plot of the computation performed by nfa.*)
+
+
+(* ::Subsection:: *)
+(*NFA Implementation*)
 
 
 (* ::Input::Initialization:: *)
@@ -426,6 +483,10 @@ Return[newFA];
 ];
 
 
+(* ::Text:: *)
+(*Plotting functions*)
+
+
 (* ::Input::Initialization:: *)
 (* Pretty output for NFAExecutionTree *)
 GenerationTransform[node_Association,generation_]:={
@@ -516,6 +577,40 @@ VertexSize->0.1
 ];
 
 
+(* ::Section:: *)
+(*Regular expressions*)
+
+
+(* ::Text:: *)
+(*A regular expression, regex or regexp  is a sequence of characters that define a search pattern. Usually this pattern is used by string searching algorithms for "find" or "find and replace" operations on strings, or for input validation. It is a technique that developed in theoretical computer science and formal language theory. In practice, regular expressions will allow us to transform raw code text into a set of tokens labeled by their type.*)
+
+
+(* ::Text:: *)
+(*This regex implementation is just a front-end to the Finite Automata operations.*)
+(**)
+(*Regex[c] creates a recognizer for the character c.*)
+(*Regex[str, tokenRecognize]  creates a recognizer for the string str which classifies it as the token tokenRecognize.*)
+(*RegexUnion[args] Perform the regular operation union. Can be applied to an arbitrary number of finite automate type arguments args.*)
+(*RegexConcatenation[args] Perform the regular operation concatenation. Can be applied to an arbitrary number of finite automate type arguments args.*)
+(*RegexStar[fa] perform the regular operation kleene star to a finite automata fa.*)
+(*RegexStar[str] perform the regular operation kleene star to a string str.*)
+(*RegexDagger[fa] perform the regular operation dagger to a finite automata fa.*)
+(*RegexDagger[str]perform the regular operation dagger to a string str.*)
+(**)
+(*RegexAlphabet[alphabet] creates a recognizer for a string containing the alphabet.*)
+(*RegexAlphabetLowercase[] lowercase alphabet wrapper.*)
+(*RegexAlphabetUppercase[] uppercase alphabet wrapper.*)
+(*RegexAlphabet[]  A...Za...z recognizer.*)
+(*RegexDigits[] 0...9 recognizer.*)
+(*RegexASCIIChars[] recognizes every char in the ASCII standard.*)
+(**)
+(*RegexCompute[fa, input] compute if input is recognized by fa, and if applicable, return the recognized token.*)
+
+
+(* ::Subsection:: *)
+(*RegEx Implementation*)
+
+
 (* ::Input::Initialization:: *)
 RegexUnion[args__]:=NFAUnion[args];
 RegexConcatenation[args__]:=NFAConcatention[args];
@@ -587,6 +682,27 @@ Cases[
 
 Return[{trace,result,recognizedTokens}];
 ];
+
+
+(* ::Section:: *)
+(*Lexer*)
+
+
+(* ::Text:: *)
+(*In computer science, lexical analysis, lexing or tokenization is the process of converting a sequence of characters (such as in a computer program or web page) into a sequence of tokens (strings with an assigned and thus identified meaning). A program that performs lexical analysis may be termed a lexer, tokenizer, or scanner, though scanner is also a term for the first stage of a lexer.*)
+(**)
+(*Token[symbol, name] is a token constructor.*)
+(*CreateTokens[list] creates a token list from a list that contains {symbol, name} pairs.*)
+(*CreateTokenRecognizer[tokenList] creates a recognizer (implemented as  a regular expression and using a finite automata as a backend) of every token in tokenList. *)
+(**)
+(*GetToken[input, symbolTokens, keywordTokens] for a input string tries to match a symbol token or a keyword token. If no match is found it returns $Failed. Keyword tokens have precedence over symbol tokens.*)
+(*GetNextToken[program, symbolTokens, keywordTokens] for a input string program, tries to match the biggest token from the left of the string. *)
+(*Tokenize[program, symbolTokens, keywordTokens] transform the input string program into a list of tokens by using the recognizers symbolTokens and keywordTokens.*)
+(*Lint[program, symbolTokens, keywordTokens, colorRules] applies styling transformations for each token.*)
+
+
+(* ::Subsection:: *)
+(*Lexer implementation*)
 
 
 (* ::Input::Initialization:: *)
@@ -688,6 +804,24 @@ Return[formattedTokens];
 ];
 
 
+(* ::Section:: *)
+(*Parser*)
+
+
+(* ::Text:: *)
+(*Parsing, syntax analysis, or syntactic analysis is the process of analysing a string of symbols, either in natural language, computer languages or data structures, conforming to the rules of a formal grammar. A parser is a software component that takes input data (frequently text) and builds a data structure \[Dash] often some kind of parse tree, abstract syntax tree or other hierarchical structure, giving a structural representation of the input while checking for correct syntax.*)
+(**)
+(*In this project a recursive descent parser is used.  A recursive descent parser is a kind of top-down parser built from a set of mutually recursive procedures (or a non-recursive equivalent) where each such procedure implements one of the non-terminals of the grammar. Thus the structure of the resulting program closely mirrors that of the grammar it recognizes.*)
+
+
+(* ::Subsection:: *)
+(*Parser implementation*)
+
+
+(* ::Subsubsection:: *)
+(*Grammar beautification*)
+
+
 (* ::Input::Initialization:: *)
 GrammarPrettifyRule[rule_]:=Style[rule["From"],Bold]->ReplaceAll[rule["To"],{NonTerm[arg_]:>Style[arg,Bold],Term[arg_]:>Style[arg,Italic]}];
 GrammarPrettify[grammar_]:=Column[Map[GrammarPrettifyRule,grammar]];
@@ -706,6 +840,15 @@ colorStyle = Join[Thread[Cases[allSymbols,_NonTerm]->Blue],Thread[Cases[allSymbo
 
 HighlightGraph[Graph[graphData,VertexLabels->"Name",VertexStyle->colorStyle,ImageSize->800],highlight]
 ];
+
+
+(* ::Subsubsection:: *)
+(*Rule matching*)
+
+
+(* ::Text:: *)
+(*MatchTerminalsWithRule[stateId, lastId, input, rule] try to match the input with a production rule from the grammar. stateId and lastId are labels to avoid ambiguity in the parse tree.*)
+(*MatchTerminals[{state, stateId}, lastId, input, grammar] tries to match the input with every production rule in grammar. This is used for the parse process.*)
 
 
 (* ::Input::Initialization:: *)
@@ -764,6 +907,17 @@ possibleTransitions = Cases[grammar,KeyValuePattern[{"From"->state}]];
 matched = Last[MapUntil[{#,MatchTerminalsWithRule[stateId,lastId,input,#]}&,possibleTransitions,Last[#]=!=$Failed&]];
 Return[matched];
 ];
+
+
+(* ::Subsubsection:: *)
+(*Parser*)
+
+
+(* ::Text:: *)
+(*VerifyGrammar[grammar] verifies the correctness of grammar.*)
+(*VerifyInput[tokenList] verifies the correctness of an input to be parsed in the form of a tokenList.*)
+(*Parse[input, grammar] parses input in the form of a token list and returns a parse tree and semantic actions associated with every NonTerminal of the parse tree.*)
+(*ParseTree[input, grammar] returns a graphical representation of the parse tree generated by Parse.*)
 
 
 (* ::Input::Initialization:: *)
@@ -911,6 +1065,18 @@ PlotParseStep[grammar,parseTrace[[i+1]]["Rule"],parseRules[[i]],parseTrace[[i+1]
 ];
 
 
+(* ::Chapter:: *)
+(*PL/0 Implementation*)
+
+
+(* ::Section:: *)
+(*Lexer tokens definition*)
+
+
+(* ::Text:: *)
+(*Here we define the tokens that will be recognized by the lexer.*)
+
+
 (* ::Input::Initialization:: *)
 tokenSymbols = CreateTokens[
 {
@@ -956,6 +1122,14 @@ tokenKeywords = CreateTokens[
 ];
 
 
+(* ::Subsection:: *)
+(*Lexer token implementation*)
+
+
+(* ::Text:: *)
+(*Here we implement Regex recognizers for several types of expressions like keywords, variable identifiers, number literals, etc.*)
+
+
 (* ::Input::Initialization:: *)
 Print["Initializing tokenizer..."];
 tokenSymbolsRecognizer = CreateTokenRecognizer[tokenSymbols];
@@ -968,6 +1142,14 @@ identifierRecognizer = Regex[identifierRegex,"Identifier"];
 numberLiteralRecognizer = Regex[numberLiteralRegex,"NumberLiteral"];
 symbolRecognizer= RegexUnion[identifierRecognizer,numberLiteralRecognizer,tokenSymbolsRecognizer];
 Print["Done."];
+
+
+(* ::Section:: *)
+(*Grammar definition*)
+
+
+(* ::Subsection:: *)
+(*Grammar implementation*)
 
 
 (* ::Input::Initialization:: *)
@@ -991,6 +1173,14 @@ CurrentLabel[s_]:=StringJoin[currentLabel,"::",s];
 LineJoin[l_]:=StringJoin[Riffle[DeleteCases[l,""]," "]];
 ColumnJoin[l_]:=StringJoin[Riffle[DeleteCases[l,""],"\n"]];
 LabelIdentifier[s_]:=StringJoin["<",s,">"];
+
+
+(* ::Text:: *)
+(*The grammar will be specified in the form*)
+(*<|"From"-> label, "To"->{Subscript[X, 1],... , Subscript[X, n]}, "Action"->{Subscript[l, 1]:> Subscript[f, 1],... , Subscript[l, m]:> Subscript[f, m]} |>*)
+(*where label is the name of a NonTerminal,  each Subscript[X, i] is a Terminal or NonTerminal, Subscript[l, i]is a property of the NonTerm[label] and Subscript[f, i] are functions that are evaluated with values synthesized from Subscript[X, 1],... , Subscript[X, n].*)
+(**)
+(*We specify how each production rule transform to code by the tag "TACode" which is an acronym for "Three Address Code". This will be explained in the next section where the parse tree will be synthesized.*)
 
 
 (* ::Input::Initialization:: *)
@@ -1386,6 +1576,21 @@ LineJoin[{NonTerm["MultRep"]["Op"],CurrentVar[], NonTerm["Factor"]["Value"],NonT
 };
 
 
+(* ::Section:: *)
+(*Parse tree synthesization*)
+
+
+(* ::Text:: *)
+(*GetAction[treeSymbol, parseTree] returns the semantic action corresponding to the parseTree. *)
+(*SynthesizeNonTerm[treeSymbol, parseTree, synthesizations] creates the synthesization for the nonterminal treeSymbol.*)
+(*SynthesizeTerm[treeSymbol, synthesizations] creates the synthesization for the terminal treeSymbol.*)
+(*SynthesizeTree[parseTree] synthesizes the parseTree by using the semantic actions in the grammar.*)
+
+
+(* ::Subsection:: *)
+(*Parse tree synthesization implementation*)
+
+
 (* ::Input::Initialization:: *)
 GetAction[treeSymbol_,parseTree_]:=Block[{children,replaceTerms,action},
 (* 
@@ -1458,6 +1663,24 @@ Dataset@Map[FormatSynthValues,grouped]
 ];
 
 
+(* ::Section:: *)
+(*Compilation to intermediate code*)
+
+
+(* ::Text:: *)
+(*Since the tree synthesization is L-Attributed, meaning that every node can only synthesize from its children, variables inside procedures "cannot see" if there is already another variable in the global space with the same name. This is not a problem since we can label variables inside procedures to differentiate them from their global counterparts. This is done by ProcedureProcessTags for each procedure. ICProcessTags does this but for the whole synthesized tree. The resulting code is a form of intermediate code that can be translated to any target machine.*)
+(**)
+(*ProcedureProcessLabels[ic, from, to, globalVar] processes the procedure enclosed in [from, to] changing the labels to reflect that symbols in the interval belong to the corresponding procedure. Labels in globalVars are left unprocessed.*)
+(*ICProcessLabels[ic] processes all the labels in ic.*)
+(*PL0ParseAndSynthesize[code] returns ic without processing the labels.*)
+(*PL0CompileToIC[code] returns ic with processed labels.*)
+(*PlotIC[ic] graphical representation of IC.*)
+
+
+(* ::Subsection:: *)
+(*IC compilation implementation*)
+
+
 (* ::Input::Initialization:: *)
 IsLabelQ[s_]:=And[StringStartsQ[s, "<"], StringEndsQ[s, ">"]];
 IsTempQ[s_]:=StringStartsQ[s, "$"];
@@ -1482,7 +1705,7 @@ tempSymbols = DeleteDuplicates[Select[procInstructions,IsTempQ]];
 replaceTempSymbolsRules = Map[#->StringJoin["<",#,">"]&,tempSymbols];
 tempDeclarations = Thread[{"declare_var",replaceTempSymbolsRules[[All,2]]}];
 processed = ReplaceAll[ic,  replaceTempSymbolsRules];
-processed = InsertSequence[processed,tempDeclarations,-2];
+processed = InsertSequence[processed,tempDeclarations,-1];
 Return[processed];
 ];
 GlobalProcessLabelsAndTemps[{}] = {};
@@ -1536,6 +1759,25 @@ Frame->True
 ];
 
 
+(* ::Chapter:: *)
+(*Assembly code generation*)
+
+
+(* ::Text:: *)
+(*Intermediate code is converted directly to assembler by simple substitution rules. Also, some standard routines like multiplication or division have to be appended at the end of the ASM code since the target machine cannot handle these operations natively.*)
+(**)
+(*CompileICToASM[ic] compiles intermediate code into assembler.*)
+(*CompilePL0ToASM[code] compiles PL/0 code into assembler.*)
+
+
+(* ::Section:: *)
+(*Common routines*)
+
+
+(* ::Text:: *)
+(*Since the target machine doesn't have native instructions for implementing multiplication or division, we can add them as procedures and insert them in the resulting program if needed.*)
+
+
 (* ::Input::Initialization:: *)
 divisionRoutine = "Label <divide>
 LoadA <divide::zero>
@@ -1577,6 +1819,10 @@ Declare <multiply::n1> 0
 Declare <multiply::n2> 0
 Declare <multiply::result> 0
 Declare <multiply::zero> 0";
+
+
+(* ::Section:: *)
+(*Intermediate code to assembly conversion rules*)
 
 
 (* ::Input::Initialization:: *)
@@ -1696,12 +1942,7 @@ PL0Compile[inputFile_,outputFile_]:=Block[{code,machineCode,machineCodeAsNumbers
 code = Import[inputFile,"Text"];
 machineCode = AssemblyCompile[CompilePL0ToASM[code]];
 machineCodeAsNumbers = Map[FromDigits[#,2]&,machineCode];
-ba = StringToByteArray[ExportString[machineCodeAsNumbers,"UnsignedInteger16"]];
-
-If[FileExistsQ[outputFile],DeleteFile[outputFile]];
-file=CreateFile[outputFile];
-BinaryWrite[file,ba];
-Close[file];
+Export[outputFile,machineCodeAsNumbers,"UnsignedInteger16"];
 ];
 
 If[Length[$ScriptCommandLine]==3,
