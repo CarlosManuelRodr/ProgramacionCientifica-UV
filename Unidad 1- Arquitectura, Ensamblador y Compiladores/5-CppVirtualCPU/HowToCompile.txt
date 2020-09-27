@@ -1,0 +1,2 @@
+Example of compilation:
+wolframscript -file Compiler.wls "countTo10.pl0" "countTo10.vme"
