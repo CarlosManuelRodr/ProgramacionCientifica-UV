@@ -7,6 +7,7 @@ El material con el que se trabajará durante el curso se encuentra en este repos
 
 Se recomienda a los estudiantes clonar el repositorio mediante una herramienta basada en Git y realizar un pull al iniciar cada clase, esto con el fin de mantener el material de clase actualizado. 
 
+Las grabaciones de las clases se encuentran en [esta lista de reproducción](https://www.youtube.com/playlist?list=PLO3arg4juFVaRyTo2RcaIxSBJF4kUbnSs).
  
 
 ## Temario 
