@@ -1,0 +1,82 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S MDL -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     adult
+Instances:    32561
+Attributes:   15
+              age
+              workclass
+              fnlwgt
+              education
+              education-num
+              marital-status
+              occupation
+              relationship
+              race
+              sex
+              capital-gain
+              capital-loss
+              hours-per-week
+              native-country
+              income
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=15 #classindex=14
+Network structure (nodes followed by parents)
+age(10): income 
+workclass(9): income 
+fnlwgt(10): income 
+education(16): income 
+education-num(10): income 
+marital-status(7): income 
+occupation(15): income 
+relationship(6): income 
+race(5): income 
+sex(2): income 
+capital-gain(6): income 
+capital-loss(9): income 
+hours-per-week(10): income 
+native-country(42): income 
+income(2): 
+LogScore Bayes: -538144.3480711506
+LogScore BDeu: -539153.0503165484
+LogScore MDL: -539244.8264249006
+LogScore ENTROPY: -537753.7365035333
+LogScore AIC: -538040.7365035333
+
+
+Time taken to build model: 0.12 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0.09 seconds
+
+=== Summary ===
+
+Correctly Classified Instances       26691               81.9723 %
+Incorrectly Classified Instances      5870               18.0277 %
+Kappa statistic                          0.5528
+Mean absolute error                      0.1961
+Root mean squared error                  0.3636
+Relative absolute error                 53.6402 %
+Root relative squared error             85.0261 %
+Total Number of Instances            32561     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.834    0.224    0.921      0.834    0.875      0.562    0.897     0.965      <=50K
+                 0.776    0.166    0.597      0.776    0.675      0.562    0.897     0.740      >50K
+Weighted Avg.    0.820    0.210    0.843      0.820    0.827      0.562    0.897     0.911     
+
+=== Confusion Matrix ===
+
+     a     b   <-- classified as
+ 20608  4112 |     a =  <=50K
+  1758  6083 |     b =  >50K
+
+

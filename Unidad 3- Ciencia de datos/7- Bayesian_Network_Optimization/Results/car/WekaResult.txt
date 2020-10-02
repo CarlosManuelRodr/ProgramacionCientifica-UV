@@ -1,0 +1,70 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -batch-size 600 -D -Q weka.classifiers.bayes.net.search.local.GeneticSearch -- -L 10 -A 50 -U 100 -R 1 -M -C -S MDL -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     car
+Instances:    1728
+Attributes:   7
+              buying
+              maint
+              doors
+              persons
+              lug_boot
+              safety
+              class
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=7 #classindex=6
+Network structure (nodes followed by parents)
+buying(4): class 
+maint(4): class 
+doors(4): 
+persons(3): class 
+lug_boot(3): class 
+safety(3): class 
+class(4): 
+LogScore Bayes: -13660.854131426595
+LogScore BDeu: -13776.039653721178
+LogScore MDL: -13791.101931103754
+LogScore ENTROPY: -13589.824492470925
+LogScore AIC: -13643.824492470925
+
+
+Time taken to build model: 1.23 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0.03 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1490               86.2269 %
+Incorrectly Classified Instances       238               13.7731 %
+Kappa statistic                          0.6871
+Mean absolute error                      0.1101
+Root mean squared error                  0.2229
+Relative absolute error                 48.0993 %
+Root relative squared error             65.917  %
+Total Number of Instances             1728     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.955    0.180    0.925      0.955    0.940      0.793    0.982     0.993     unacc
+                 0.732    0.094    0.689      0.732    0.710      0.624    0.958     0.864     acc
+                 0.523    0.004    0.850      0.523    0.648      0.657    0.998     0.941     vgood
+                 0.290    0.007    0.625      0.290    0.396      0.410    0.985     0.605     good
+Weighted Avg.    0.862    0.147    0.858      0.862    0.856      0.735    0.977     0.947     
+
+=== Confusion Matrix ===
+
+    a    b    c    d   <-- classified as
+ 1155   53    0    2 |    a = unacc
+   93  281    0   10 |    b = acc
+    0   31   34    0 |    c = vgood
+    0   43    6   20 |    d = good
+
+

@@ -1,0 +1,72 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S MDL -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     tic-tac-toe
+Instances:    958
+Attributes:   10
+              top-left-square
+              top-middle-square
+              top-right-square
+              middle-left-square
+              middle-middle-square
+              middle-right-square
+              bottom-left-square
+              bottom-middle-square
+              bottom-right-square
+              Class
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=10 #classindex=9
+Network structure (nodes followed by parents)
+top-left-square(3): Class 
+top-middle-square(3): Class 
+top-right-square(3): Class 
+middle-left-square(3): Class 
+middle-middle-square(3): Class 
+middle-right-square(3): Class 
+bottom-left-square(3): Class 
+bottom-middle-square(3): Class 
+bottom-right-square(3): Class 
+Class(2): 
+LogScore Bayes: -9811.362031625371
+LogScore BDeu: -9860.681280951585
+LogScore MDL: -9856.223591281236
+LogScore ENTROPY: -9729.223907388778
+LogScore AIC: -9766.223907388778
+
+
+Time taken to build model: 0.01 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0.01 seconds
+
+=== Summary ===
+
+Correctly Classified Instances         669               69.833  %
+Incorrectly Classified Instances       289               30.167  %
+Kappa statistic                          0.2945
+Mean absolute error                      0.3618
+Root mean squared error                  0.423 
+Relative absolute error                 79.8708 %
+Root relative squared error             88.8865 %
+Total Number of Instances              958     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.832    0.554    0.739      0.832    0.783      0.300    0.769     0.876     positive
+                 0.446    0.168    0.585      0.446    0.506      0.300    0.769     0.669     negative
+Weighted Avg.    0.698    0.420    0.686      0.698    0.687      0.300    0.769     0.805     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 521 105 |   a = positive
+ 184 148 |   b = negative
+
+

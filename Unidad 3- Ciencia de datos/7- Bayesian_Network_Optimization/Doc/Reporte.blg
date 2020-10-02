@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Arch Linux)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: Reporte.aux
+The style file: plain.bst
+Database file #1: Referencias.bib
+Warning--empty journal in NoTears
+Warning--empty year in NoTears
+Warning--empty journal in MDL
+Warning--empty year in MDL
+Warning--empty journal in McKay2003
+Warning--empty year in McKay2003
+Warning--empty journal in Nicandro
+Warning--empty year in Nicandro
+You've used 5 entries,
+            2118 wiz_defined-function locations,
+            521 strings with 4613 characters,
+and the built_in function-call counts, 1368 in all, are:
+= -- 123
+> -- 61
+< -- 1
++ -- 25
+- -- 20
+* -- 86
+:= -- 239
+add.period$ -- 12
+call.type$ -- 5
+change.case$ -- 25
+chr.to.int$ -- 0
+cite$ -- 13
+duplicate$ -- 62
+empty$ -- 107
+format.name$ -- 20
+if$ -- 274
+int.to.chr$ -- 0
+int.to.str$ -- 5
+missing$ -- 5
+newline$ -- 24
+num.names$ -- 10
+pop$ -- 44
+preamble$ -- 1
+purify$ -- 20
+quote$ -- 0
+skip$ -- 39
+stack$ -- 0
+substring$ -- 49
+swap$ -- 8
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 20
+warning$ -- 8
+while$ -- 13
+width$ -- 6
+write$ -- 42
+(There were 8 warnings)

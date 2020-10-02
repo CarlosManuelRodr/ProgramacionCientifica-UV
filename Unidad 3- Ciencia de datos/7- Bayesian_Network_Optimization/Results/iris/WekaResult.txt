@@ -1,0 +1,62 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -batch-size 600 -D -Q weka.classifiers.bayes.net.search.local.GeneticSearch -- -L 10 -A 50 -U 100 -R 1 -M -C -S MDL -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     iris
+Instances:    150
+Attributes:   4
+              Sepal length
+               Sepal width
+               Petal length
+               Class
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=4 #classindex=3
+Network structure (nodes followed by parents)
+Sepal length(3):  Petal length 
+ Sepal width(2):  Petal length 
+ Petal length(3):  Class 
+ Class(3): 
+LogScore Bayes: -389.2863285647196
+LogScore BDeu: -415.9440485779893
+LogScore MDL: -422.96203071884133
+LogScore ENTROPY: -380.37163071902324
+LogScore AIC: -397.37163071902324
+
+
+Time taken to build model: 0.07 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0 seconds
+
+=== Summary ===
+
+Correctly Classified Instances         143               95.3333 %
+Incorrectly Classified Instances         7                4.6667 %
+Kappa statistic                          0.93  
+Mean absolute error                      0.0676
+Root mean squared error                  0.1681
+Relative absolute error                 15.2116 %
+Root relative squared error             35.6682 %
+Total Number of Instances              150     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     Iris-setosa
+                 0.880    0.010    0.978      0.880    0.926      0.895    0.965     0.920     Iris-versicolor
+                 0.980    0.060    0.891      0.980    0.933      0.900    0.962     0.883     Iris-virginica
+Weighted Avg.    0.953    0.023    0.956      0.953    0.953      0.932    0.976     0.935     
+
+=== Confusion Matrix ===
+
+  a  b  c   <-- classified as
+ 50  0  0 |  a = Iris-setosa
+  0 44  6 |  b = Iris-versicolor
+  0  1 49 |  c = Iris-virginica
+
+

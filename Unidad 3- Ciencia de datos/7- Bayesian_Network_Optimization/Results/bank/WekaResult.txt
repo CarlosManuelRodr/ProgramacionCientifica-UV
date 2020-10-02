@@ -1,0 +1,86 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S MDL -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     bank
+Instances:    4521
+Attributes:   17
+              age
+              job
+              marital
+              education
+              default
+              balance
+              housing
+              loan
+              contact
+              day
+              month
+              duration
+              campaign
+              pdays
+              previous
+              poutcome
+              y
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=17 #classindex=16
+Network structure (nodes followed by parents)
+age(10): y 
+job(12): y 
+marital(3): y 
+education(4): y 
+default(2): y 
+balance(7): y 
+housing(2): y 
+loan(2): y 
+contact(3): y 
+day(10): y 
+month(12): y 
+duration(9): y 
+campaign(9): y 
+pdays(10): y 
+previous(10): y 
+poutcome(4): y 
+y(2): 
+LogScore Bayes: -71865.61571251867
+LogScore BDeu: -72375.58441498736
+LogScore MDL: -72452.9958537938
+LogScore ENTROPY: -71666.05418023176
+LogScore AIC: -71853.05418023176
+
+
+Time taken to build model: 0.04 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0.03 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        4004               88.5645 %
+Incorrectly Classified Instances       517               11.4355 %
+Kappa statistic                          0.3704
+Mean absolute error                      0.1503
+Root mean squared error                  0.2928
+Relative absolute error                 73.6347 %
+Root relative squared error             91.7086 %
+Total Number of Instances             4521     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.952    0.622    0.922      0.952    0.936      0.375    0.864     0.979     no
+                 0.378    0.048    0.505      0.378    0.432      0.375    0.864     0.453     yes
+Weighted Avg.    0.886    0.556    0.874      0.886    0.878      0.375    0.864     0.919     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 3807  193 |    a = no
+  324  197 |    b = yes
+
+

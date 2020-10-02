@@ -1,0 +1,6 @@
+Population: 50
+Survivors: 10
+Mutation Probability: 0.5
+Generations: 100
+TestMethod: UseMiniBatch
+MiniBatchSize: 600
