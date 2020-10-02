@@ -1,0 +1,15 @@
+Presion,Azucar,Colesterol,Alergia,Otras Alergias,Administrar
+Alta,Alto,Alto,No,No,Si
+Alta,Alto,Alto,Si,No,Si
+Baja,Alto,Bajo,No,No,Si
+Media,Alto,Alto,No,Si,No
+Media,Bajo,Alto,Si,Si,No
+Baja,Bajo,Alto,Si,Si,Si
+Alta,Bajo,Alto,Si,No,Si
+Alta,Bajo,Bajo,No,Si,Si
+Alta,Alto,Bajo,Si,Si,No
+Baja,Bajo,Alto,Si,Si,Si
+Media,Bajo,Bajo,Si,Si,Si
+Alta,Bajo,Alto,Si,Si,No
+Baja,Alto,Alto,Si,Si,Si
+Baja,Alto,Bajo,No,No,Si
