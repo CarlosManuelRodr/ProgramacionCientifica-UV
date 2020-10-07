@@ -1,0 +1,359 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     14158,        351]
+NotebookOptionsPosition[     13524,        330]
+NotebookOutlinePosition[     14052,        349]
+CellTagsIndexPosition[     14009,        346]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Assembler", "Title",
+ CellChangeTimes->{{3.8110172586818733`*^9, 
+  3.8110172614227357`*^9}},ExpressionUUID->"6558df70-3c77-473d-af32-\
+fc1dcf9ea114"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"cpuMnemonics", " ", "=", " ", 
+   RowBox[{"{", "\[IndentingNewLine]", 
+    RowBox[{
+    "\"\<LoadA\>\"", ",", "\"\<LoadB\>\"", ",", "\"\<SetA\>\"", ",", 
+     "\"\<SetB\>\"", ",", "\"\<Store\>\"", ",", "\"\<Add\>\"", ",", 
+     "\[IndentingNewLine]", "\"\<Substract\>\"", ",", "\"\<Increment\>\"", 
+     ",", "\"\<Decrement\>\"", ",", "\"\<Jump\>\"", ",", "\"\<JumpPos\>\"", 
+     ",", "\"\<JumpNeg\>\"", ",", "\"\<JumpZero\>\"", ",", 
+     "\"\<JumpNotZero\>\"", ",", "\"\<JumpOdd\>\"", ",", 
+     "\[IndentingNewLine]", "\"\<Call\>\"", ",", "\"\<Return\>\"", ",", 
+     "\"\<Print\>\"", ",", "\"\<Draw\>\""}], "\[IndentingNewLine]", "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"opcodes", " ", "=", " ", 
+   RowBox[{"Thread", "[", 
+    RowBox[{"cpuMnemonics", "->", 
+     RowBox[{"Take", "[", 
+      RowBox[{
+       RowBox[{"Tuples", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"0", ",", "1"}], "}"}], ",", "10"}], "]"}], ",", 
+       RowBox[{"Length", "[", "cpuMnemonics", "]"}]}], "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"DecimalToBinary", "[", 
+     RowBox[{"n_", ",", 
+      RowBox[{"size_", " ", ":", "10"}]}], "]"}], ":=", 
+    RowBox[{"PadLeft", "[", 
+     RowBox[{
+      RowBox[{"IntegerDigits", "[", 
+       RowBox[{"n", ",", "2"}], "]"}], ",", "size"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"GetInstructions", "[", "asmcode_", "]"}], ":=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"separated", ",", "completed"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"separated", " ", "=", " ", 
+       RowBox[{"DeleteCases", "[", 
+        RowBox[{
+         RowBox[{"Map", "[", 
+          RowBox[{"StringSplit", ",", 
+           RowBox[{"StringSplit", "[", 
+            RowBox[{"asmcode", ",", "\"\<\\n\>\""}], "]"}]}], "]"}], ",", 
+         RowBox[{"{", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"completed", " ", "=", " ", 
+       RowBox[{"ReplaceAll", "[", 
+        RowBox[{"separated", ",", 
+         RowBox[{
+          RowBox[{"l_", "/;", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"Length", "[", "l", "]"}], "\[Equal]", "1"}], ")"}]}], 
+          "\[RuleDelayed]", 
+          RowBox[{"Append", "[", 
+           RowBox[{"l", ",", "0"}], "]"}]}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Return", "[", "completed", "]"}], ";"}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"GetPosition", "[", 
+    RowBox[{"instructions_", ",", "token_"}], "]"}], ":=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"pos", ",", "labels", ",", "countingRules"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"pos", " ", "=", " ", 
+       RowBox[{"Position", "[", 
+        RowBox[{"instructions", ",", "token"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Length", "[", "pos", "]"}], ">", "1"}], ",", 
+        RowBox[{"Return", "[", "$Failed", "]"}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"labels", " ", "=", " ", 
+       RowBox[{
+        RowBox[{"Take", "[", 
+         RowBox[{"instructions", ",", 
+          RowBox[{
+           RowBox[{"pos", "[", 
+            RowBox[{"[", 
+             RowBox[{"1", ",", "1"}], "]"}], "]"}], "-", "1"}]}], "]"}], "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"countingRules", " ", "=", " ", 
+       RowBox[{"Join", "[", 
+        RowBox[{
+         RowBox[{"Thread", "[", 
+          RowBox[{"cpuMnemonics", "\[Rule]", "2"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"\"\<Label\>\"", "\[Rule]", "0"}], ",", 
+           RowBox[{"\"\<Declare\>\"", "\[Rule]", "1"}]}], "}"}]}], "]"}]}], 
+      ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"Total", "[", 
+       RowBox[{"ReplaceAll", "[", 
+        RowBox[{"labels", ",", "countingRules"}], "]"}], "]"}]}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ProcessTags", "[", "instructions_", "]"}], ":=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"labels", ",", "variablePos"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"labels", " ", "=", " ", 
+       RowBox[{"Cases", "[", 
+        RowBox[{"instructions", ",", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"\"\<Label\>\"", ",", "tag_"}], "}"}], "\[RuleDelayed]", 
+          RowBox[{"(", 
+           RowBox[{"tag", "\[Rule]", 
+            RowBox[{"GetPosition", "[", 
+             RowBox[{"instructions", ",", 
+              RowBox[{"{", 
+               RowBox[{"\"\<Label\>\"", ",", "tag"}], "}"}]}], "]"}]}], 
+           ")"}]}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"variablePos", " ", "=", " ", 
+       RowBox[{"Cases", "[", 
+        RowBox[{"instructions", ",", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"\"\<Declare\>\"", ",", "tag_", ",", "value_"}], "}"}], 
+          "\[RuleDelayed]", 
+          RowBox[{"(", 
+           RowBox[{"tag", "\[Rule]", 
+            RowBox[{"GetPosition", "[", 
+             RowBox[{"instructions", ",", 
+              RowBox[{"{", 
+               RowBox[{"\"\<Declare\>\"", ",", "tag", ",", "value"}], "}"}]}],
+              "]"}]}], ")"}]}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Join", "[", 
+       RowBox[{"labels", ",", "variablePos"}], "]"}]}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"MachineInstructions", "[", "instructions_", "]"}], ":=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"setNumeric", ",", "removeLabels", ",", "replaceTags"}], "}"}], 
+     ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"setNumeric", " ", "=", " ", 
+       RowBox[{"ReplaceAll", "[", 
+        RowBox[{"instructions", ",", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"\"\<Declare\>\"", ",", "_", ",", "value_"}], "}"}], 
+            "\[RuleDelayed]", 
+            RowBox[{"ToExpression", "[", "value", "]"}]}], ",", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"\"\<SetA\>\"", ",", "value_"}], "}"}], "\[RuleDelayed]", 
+            RowBox[{"{", 
+             RowBox[{"\"\<SetA\>\"", ",", 
+              RowBox[{"ToExpression", "[", "value", "]"}]}], "}"}]}], ",", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"\"\<SetB\>\"", ",", "value_"}], "}"}], "\[RuleDelayed]", 
+            RowBox[{"{", 
+             RowBox[{"\"\<SetB\>\"", ",", 
+              RowBox[{"ToExpression", "[", "value", "]"}]}], "}"}]}]}], " ", 
+          "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"removeLabels", " ", "=", " ", 
+       RowBox[{"DeleteCases", "[", 
+        RowBox[{"setNumeric", ",", 
+         RowBox[{"{", 
+          RowBox[{"\"\<Label\>\"", ",", "__"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"replaceTags", " ", "=", " ", 
+       RowBox[{"ReplaceAll", "[", 
+        RowBox[{"removeLabels", ",", 
+         RowBox[{"ProcessTags", "[", "instructions", "]"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"Return", "[", "replaceTags", "]"}], ";"}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"AssemblyCompile", "[", "asmcode_", "]"}], ":=", 
+    RowBox[{"Block", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"linearized", ",", "rules", ",", " ", "machineCode"}], "}"}], 
+      ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"linearized", " ", "=", " ", 
+        RowBox[{"Flatten", "[", 
+         RowBox[{"MachineInstructions", "[", 
+          RowBox[{"GetInstructions", "[", "asmcode", "]"}], "]"}], "]"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"rules", " ", "=", " ", 
+        RowBox[{"Append", "[", 
+         RowBox[{"opcodes", ",", 
+          RowBox[{"n_Integer", "\[RuleDelayed]", 
+           RowBox[{"DecimalToBinary", "[", "n", "]"}]}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"machineCode", " ", "=", " ", 
+        RowBox[{"ReplaceAll", "[", 
+         RowBox[{"linearized", ",", "rules"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Return", "[", "machineCode", "]"}], ";"}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"Assemble", "[", 
+     RowBox[{"inputFile_", ",", "outputFile_"}], "]"}], ":=", 
+    RowBox[{"Block", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "code", ",", "machineCode", ",", "machineCodeAsNumbers", ",", "ba", 
+        ",", "file"}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"code", " ", "=", " ", 
+        RowBox[{"Import", "[", 
+         RowBox[{"inputFile", ",", "\"\<Text\>\""}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"machineCode", " ", "=", " ", 
+        RowBox[{"AssemblyCompile", "[", "code", "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"machineCodeAsNumbers", " ", "=", " ", 
+        RowBox[{"Map", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"FromDigits", "[", 
+            RowBox[{"#", ",", "2"}], "]"}], "&"}], ",", "machineCode"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{
+        "outputFile", ",", "machineCodeAsNumbers", ",", 
+         "\"\<UnsignedInteger16\>\""}], "]"}], ";"}]}], "\[IndentingNewLine]",
+      "]"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"If", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Length", "[", "$ScriptCommandLine", "]"}], "\[Equal]", "3"}], 
+    ",", "\[IndentingNewLine]", 
+    RowBox[{"Assemble", "[", 
+     RowBox[{
+      RowBox[{"$ScriptCommandLine", "[", 
+       RowBox[{"[", "2", "]"}], "]"}], ",", 
+      RowBox[{"$ScriptCommandLine", "[", 
+       RowBox[{"[", "3", "]"}], "]"}]}], "]"}], "\[IndentingNewLine]", ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Print", "[", "\"\<Invalid number of arguments\>\"", "]"}]}], 
+   "\[IndentingNewLine]", "]"}], ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.7637522761713896`*^9, 3.7637522811397123`*^9}, {
+   3.763752539119774*^9, 3.7637525403896*^9}, {3.7637527247948284`*^9, 
+   3.7637527271068635`*^9}, {3.7637548583030324`*^9, 3.76375485857769*^9}, {
+   3.7637553153862534`*^9, 3.7637553880654182`*^9}, {3.7637558657226906`*^9, 
+   3.763755865970436*^9}, {3.763756147410583*^9, 3.7637562054495463`*^9}, 
+   3.7637562744347906`*^9, {3.7637564279224844`*^9, 3.763756431393264*^9}, {
+   3.763838942396756*^9, 3.763838942548704*^9}, {3.7638389773406134`*^9, 
+   3.763838977428562*^9}, {3.763839149820098*^9, 3.7638391500286665`*^9}, {
+   3.763839529434287*^9, 3.7638395589470053`*^9}, {3.763839658307597*^9, 
+   3.7638396780988894`*^9}, {3.7638398759535704`*^9, 3.763839927433342*^9}, {
+   3.7638423726453424`*^9, 3.763842461084761*^9}, {3.7638424982853947`*^9, 
+   3.7638425028210163`*^9}, {3.763842557429591*^9, 3.76384256186103*^9}, {
+   3.7638426343257217`*^9, 3.763842663868944*^9}, {3.7638428309498825`*^9, 
+   3.763842847941127*^9}, {3.763842878869466*^9, 3.7638428929093585`*^9}, {
+   3.7638429885961485`*^9, 3.763843044645608*^9}, {3.7638431853481216`*^9, 
+   3.7638431986136203`*^9}, {3.763843235659871*^9, 3.763843289899954*^9}, {
+   3.7638433246362762`*^9, 3.7638433378040004`*^9}, {3.763844822427657*^9, 
+   3.763844826738652*^9}, {3.763900993434781*^9, 3.763901002347664*^9}, {
+   3.7639886561561203`*^9, 3.763988683604949*^9}, {3.764007163873229*^9, 
+   3.7640072314232893`*^9}, {3.764017705167431*^9, 3.764017732177135*^9}, {
+   3.764093549755788*^9, 3.764093573752721*^9}, 3.764093813202981*^9, {
+   3.764093864529208*^9, 3.764093882378508*^9}, {3.764286288967265*^9, 
+   3.764286313385746*^9}, {3.8101450253056707`*^9, 3.810145050439103*^9}, {
+   3.8101478549272895`*^9, 3.8101480174875584`*^9}, {3.810151936604901*^9, 
+   3.8101519583174176`*^9}, {3.8101520514405985`*^9, 3.810152092150638*^9}, {
+   3.810152500835251*^9, 3.810152504479659*^9}, {3.8102178055046616`*^9, 
+   3.8102178056330404`*^9}, {3.810220893607871*^9, 3.8102209019381094`*^9}, {
+   3.811017295629034*^9, 3.811017316988067*^9}},
+ CellLabel->"In[11]:=",ExpressionUUID->"bbb3555e-be25-4b9c-9ccc-785f2142acf5"]
+}, Open  ]]
+},
+WindowSize->{960, 478},
+WindowMargins->{{-5.5, Automatic}, {Automatic, -5.5}},
+TaggingRules->{
+ "WelcomeScreenSettings" -> {"FEStarting" -> False}, "TryRealOnly" -> False},
+Magnification:>0.6 Inherited,
+FrontEndVersion->"12.1 para Microsoft Windows (64-bit) (March 18, 2020)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"4f46b558-db03-4ed4-8e08-fb3fe74a35c8"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 156, 3, 59, "Title",ExpressionUUID->"6558df70-3c77-473d-af32-fc1dcf9ea114"],
+Cell[739, 27, 12769, 300, 633, "Input",ExpressionUUID->"bbb3555e-be25-4b9c-9ccc-785f2142acf5",
+ InitializationCell->True]
+}, Open  ]]
+}
+]
+*)
+
