@@ -1,0 +1,7 @@
+Tarea 2: Crear los siguentes programas en el lenguaje PL/0
+- Crear un programa que escriba en pantalla la tabla de multiplicar del 6.
+- Un programa que calcule la media aritmética de 4 números (8, 19, 65, 2, 42, 12) y después muestre en pantalla el resultado.
+- Del programa anterior, crear un programa que después muestre cuáles números están por encima de la media.
+(Maestría)
+- Cree un programa que implemente la función módulo, es decir, que muestre el residuo de la división entre dos números.
+- Con la función módulo del ejercicio anterior, crear un programa que escriba en pantalla los números del 1 al 50 que sean múltiplos de 3.
