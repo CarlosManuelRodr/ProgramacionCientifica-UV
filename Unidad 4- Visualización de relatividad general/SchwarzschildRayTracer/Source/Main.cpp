@@ -132,9 +132,12 @@ int main()
 
     // Carga las texturas
     int earthTextWidth, earthTextHeight, earthTextChannels;
-    unsigned char *earthTexture = stbi_load("Textures\\earthmap.jpg", &earthTextWidth, &earthTextHeight, &earthTextChannels, 0);
+    string earthTexturePath = filename_join({ "Textures", "earthmap.jpg" });
+    unsigned char *earthTexture = stbi_load(earthTexturePath.c_str(), &earthTextWidth, &earthTextHeight, &earthTextChannels, 0);
+
     int skyTextWidth, skyTextHeight, skyTextChannels;
-    unsigned char* skyTexture = stbi_load("Textures\\starbackground.jpg", &skyTextWidth, &skyTextHeight, &skyTextChannels, 0);
+    string starBackgroundPath = filename_join({ "Textures", "starbackground.jpg" });
+    unsigned char* skyTexture = stbi_load(starBackgroundPath.c_str(), &skyTextWidth, &skyTextHeight, &skyTextChannels, 0);
 
     // Inicializa el mundo
     vector<Hitable*> hitableList;
