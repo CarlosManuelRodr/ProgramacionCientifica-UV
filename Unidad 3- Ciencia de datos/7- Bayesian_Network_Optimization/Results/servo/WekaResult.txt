@@ -1,0 +1,74 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -batch-size 600 -D -Q weka.classifiers.bayes.net.search.local.GeneticSearch -- -L 10 -A 50 -U 100 -R 1 -M -C -S MDL -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     servo-weka.filters.unsupervised.attribute.NumericToNominal-Rfirst-last
+Instances:    167
+Attributes:   5
+              motor
+              screw
+              pgain
+              vgain
+              class
+Test mode:    evaluate on training data
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=5 #classindex=4
+Network structure (nodes followed by parents)
+motor(5): 
+screw(5): 
+pgain(4): class 
+vgain(5): pgain 
+class(8): 
+LogScore Bayes: -1113.4150595131832
+LogScore BDeu: -1256.6671544366045
+LogScore MDL: -1254.5747786070426
+LogScore ENTROPY: -1113.8299487655818
+LogScore AIC: -1168.8299487655818
+
+
+Time taken to build model: 0.07 seconds
+
+=== Evaluation on training set ===
+
+Time taken to test model on training data: 0 seconds
+
+=== Summary ===
+
+Correctly Classified Instances         104               62.2754 %
+Incorrectly Classified Instances        63               37.7246 %
+Kappa statistic                          0.2958
+Mean absolute error                      0.1173
+Root mean squared error                  0.2339
+Relative absolute error                 74.4449 %
+Root relative squared error             84.077  %
+Total Number of Instances              167     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.968    0.356    0.778      0.968    0.863      0.663    0.904     0.912     '(-inf-0.828136]'
+                 0.000    0.000    ?          0.000    ?          ?        0.823     0.108     '(5.00945-5.706336]'
+                 0.333    0.289    0.260      0.333    0.292      0.041    0.741     0.392     '(0.828136-1.525021]'
+                 0.000    0.000    ?          0.000    ?          ?        0.817     0.065     '(1.525021-2.221907]'
+                 0.000    0.000    ?          0.000    ?          ?        0.890     0.268     '(3.615679-4.312565]'
+                 0.000    0.000    ?          0.000    ?          ?        0.874     0.198     '(4.312565-5.00945]'
+                 0.000    0.000    ?          0.000    ?          ?        0.770     0.048     '(6.403222-inf)'
+                 0.000    0.000    ?          0.000    ?          ?        0.879     0.067     '(2.221907-2.918793]'
+Weighted Avg.    0.623    0.268    ?          0.623    ?          ?        0.857     0.641     
+
+=== Confusion Matrix ===
+
+  a  b  c  d  e  f  g  h   <-- classified as
+ 91  0  3  0  0  0  0  0 |  a = '(-inf-0.828136]'
+  0  0  5  0  0  0  0  0 |  b = '(5.00945-5.706336]'
+ 26  0 13  0  0  0  0  0 |  c = '(0.828136-1.525021]'
+  0  0  4  0  0  0  0  0 |  d = '(1.525021-2.221907]'
+  0  0 12  0  0  0  0  0 |  e = '(3.615679-4.312565]'
+  0  0  9  0  0  0  0  0 |  f = '(4.312565-5.00945]'
+  0  0  2  0  0  0  0  0 |  g = '(6.403222-inf)'
+  0  0  2  0  0  0  0  0 |  h = '(2.221907-2.918793]'
+
+

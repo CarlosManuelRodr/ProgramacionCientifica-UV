@@ -1,0 +1,27 @@
+\begin{thebibliography}{1}
+
+\bibitem{NoTears}
+Eugene Charniak.
+\newblock Bayesian networks without tears.
+
+\bibitem{MDL}
+Nicholas~D. Levine.
+\newblock Using minimum description length for discretization classification of
+  data modeled by bayesian networks.
+
+\bibitem{McKay2003}
+Brendan~D. McKay, Frederique~E. Oggier, Gordon~F. Royle, N.~J.~A. Sloane,
+  Ian~M. Wanless, and Herbert~S. Wilf.
+\newblock Acyclic digraphs and eigenvalues of (0,1)-matrices.
+
+\bibitem{Nicandro}
+Nicandro~Cruz Ramírez.
+\newblock Building bayesian networks from data: a constraint-based approach.
+
+\bibitem{Robinson1977}
+R.~W. Robinson.
+\newblock Counting unlabeled acyclic digraphs.
+\newblock In {\em Lecture Notes in Mathematics}, pages 28--43. Springer Berlin
+  Heidelberg, 1977.
+
+\end{thebibliography}
