@@ -1,0 +1,61 @@
+Tarea 3: Crear los siguentes programas en el lenguaje C++
+=========================================================
+- Crear un programa que pida números positivos al usuario, y vaya calculando la suma de todos ellos (terminará cuando se teclea un número negativo o cero).
+
+- Crear un programa que escriba en pantalla los números del 1 al 50 que sean múltiplos de 3 (pista: habrá que recorrer todos esos números y ver si el residuo de la división entre 3 resulta 0. El residuo se puede obtener con la operación módulo implementada por el operador %).
+
+- Crear un videojuego que inicialmente genere un número secreto de tipo entero entre 1 y 100. En cada turno el usuario introducirá un número y el programa responderá si el número introducido por el usuario es mayor o menor al número secreto. Si el usuario es capaz de adivinar el número secreto en 5 turnos, gana la partida. En caso contrario, pierde la partida.
+
+- El movimiento de un péndulo simple de longitud L y con constante de fricción k está descrito por la ecuación diferencial
+θ''[t] = - g/L Sen(θ[t]) - kL θ'[t]. Resuelva la ecuación diferencial por el método de Euler y grafique el resultado.
+
+- La criptografía es una rama del cómputo que estudia cómo cifrar mensajes. Uno de los métodos criptográficos más fáciles es el cifrado XOR, que consiste en modificar los bits de un número aplicando la operación lógica XOR descrita en la siguiente tabla:
+
+p  |  q  | p ⊕ q
+=================
+0  |  0  |   0
+0  |  1  |   1
+1  |  0  |   1
+1  |  1  |   0
+
+Supongamos que queremos cifrar la palabra "Cafe", para ello vemos que usando la tabla ASCII los números en binario correspondientes al texto son: 01000011 01100001 01100110 01100101
+Ahora imaginemos que escogemos el número 243 como clave secreta, cuya representación en binario es 11110011. Podemos cifrar el mensaje aplicando la operación XOR a cada byte:
+
+   01000011 01100001 01100110 01100101
+⊕ 11110011 11110011 11110011 11110011
+--------------------------------------
+   10110000 10010010 10010101 10010110
+
+El mensaje resultante queda codificado como: "°". Si deseamos desencriptar el mensaje sólo tenemos que aplicar la operación XOR de nuevo con la misma clave:
+
+   10110000 10010010 10010101 10010110
+⊕ 11110011 11110011 11110011 11110011
+--------------------------------------
+   01000011 01100001 01100110 01100101
+
+Y esto devuelve el texto original: "Cafe".
+En C++, dadas dos variables del tipo char:
+char letra = 'C';
+char clave = 243;
+podemos aplicar la operación XOR de la siguiente manera:
+char encriptado = letra ^ clave;
+
+El ejercicio consiste en crear un programa que pida al usuario una cadena de texto, una clave secreta y encripte / desencripte el mensaje.
+   
+
+(Sólo maestría, puntos extra para licenciatura)
+===============================================
+- Crear un programa que pida 7 números enteros al usuario, y devuelva la misma lista pero con los números ordenados en orden ascendiente.
+(Tip: Pueden usar el algoritmo Bubble Sort)
+
+- Crear un programa que dibuje en un archivo BMP la visualización del conjunto de Mandelbrot.
+
+- Crear un programa que pida al usuario tres pares de coordenadas (x,y). Calcular el área del triángulo formado por los tres puntos usando la fórmula de Heron.
+
+- Crear un programa que pida al usuario los coeficientes de un sistema de 3 ecuaciones con 3 variables. Mostrar la solución que da como resultado.
+
+Problema reto (puntos extra para todos)
+=======================================
+- Crear un videojuego de 3 en raya (conocido popularmente como "gato"), donde el usuario compita contra la máquina. (Tip: La manera más eficiente de lograr esto es a través del algoritmo Minimax).
+
+- Programar "El juego de la vida" de Conway utilizando un mapa de 512x512 celdas. El mapa se inicializa con valores aleatorios, y debe mostrar la evolución durante 100 generaciones.
