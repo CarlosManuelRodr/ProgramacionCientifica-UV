@@ -10,681 +10,6 @@
 
 
 (* ::Section:: *)
-(*Finite state machine*)
-
-
-(* ::Subsection:: *)
-(*Deterministic finite automaton (DFA)*)
-
-
-(* ::Text:: *)
-(*DFA[name, transitions, start, accept, stateExpr] create an DFA from a transition list.*)
-(*DFATransitions[transitions, state]*)
-(*DFAIterate[transitions, state, inputSymbol] get the next step in the computation of the DFA for a inputSymbol.*)
-(*DFACompute[dfa, inputString] compute if input is recognized by dfa.*)
-(*FiniteAutomataPlot[fa] return a plot of the finite automata represented by fa.*)
-(*DFAExecutionPlot[dfa, inputString] return a dynamic execution plot of the computation performed by dfa.*)
-
-
-(* ::Subsection:: *)
-(*DFA Implementation*)
-
-
-(* ::Input::Initialization:: *)
-Protect[\[Epsilon]]; (* \[Epsilon] will be used as a symbol to denote the empty string *)
-Transition[parent_,child_,inputSymbol_]:=<|"Parent"->parent,"Node"->child,"InputSymbol"->inputSymbol|>;
-EmptyTransition[parent_,child_]:=Transition[parent,child,\[Epsilon]];
-FATransitions[transitions_,state_]:=Cases[transitions,KeyValuePattern[{"Parent"->state}]];
-Concatenate[l_]:=Apply[Join,l];
-
-
-(* ::Input::Initialization:: *)
-NameTag[machine_Association,state_]:=Subscript[machine["Name"],ToString[state]];
-
-Options[FiniteAutomataPlot]={"Legended"->True,"Labeled"->False};
-FiniteAutomataPlot[fa_Association,OptionsPattern[]]:=Block[{graphData,startTag,acceptTags,legend,graph},
-Switch[OptionValue["Labeled"],
-True,
-graphData = Cases[fa["Transitions"],KeyValuePattern[{"Parent"->p_,"Node"->n_,"InputSymbol"->i_}]:>Labeled[p->n,i]];
-startTag = fa["StartState"]->Red;
-acceptTags = Map[If[# != fa["StartState"],#->Green,#->Purple]&,fa["AcceptStates"]];
-,
-False,
-graphData = Cases[fa["Transitions"],KeyValuePattern[{"Parent"->p_,"Node"->n_,"InputSymbol"->i_}]:>p->n];
-startTag = fa["StartState"]->Red;
-acceptTags = Map[If[# != fa["StartState"],#->Green,#->Purple]&,fa["AcceptStates"]];
-];
-
-legend = PointLegend[{LightBlue,Red,Green,Purple},{"State","Start state","Accept state","Start/Accept state"},LegendMarkers->Graphics[Disk[]]];
-
-graph = Graph[
-graphData,
-ImageSize->400,
-VertexLabels->"Name",
-VertexStyle->Join[{startTag},acceptTags],
-VertexSize->0.1
-];
-
-If[OptionValue["Legended"],
-Return[Legended[graph,legend]],
-Return[graph]
-]
-];
-
-
-(* ::Input::Initialization:: *)
-(* DFA object constructor *)
-DFA[name_,transitions_,start_,accept_,stateExpr_:{}]:=
-<|
-"Name"->name,(* Descriptive name to keep in track the regular operations applied to it *)
-"Type"->"DFA",
-"Transitions"->transitions,
-"StartState"->start,
-"AcceptStates"->accept,
-"StateExpressions"->stateExpr (* Each state may have an associated expression *)
-|>;
-
-(* Return every deterministic transition leading to state *)
-DFATransitions[transitions_,state_]:=Cases[transitions,KeyValuePattern[{"Parent"->state}]];
-
-(* Get the next state *)
-Options[DFAIterate]={"Trace"->False};
-DFAIterate[transitions_,state_,inputSymbol_,OptionsPattern[]]:=Block[{next},
-next = Cases[
-DFATransitions[transitions,state],
-KeyValuePattern[{"InputSymbol"->i_/;MemberQ[i,inputSymbol]}]
-];
-
-(* A DFA must have only one available transition *)
-If[Length[next]==1,
-If[OptionValue["Trace"],
-Return[First[next]]
-,
-Return[First[next]["Node"]];
-]
-,
-(* TODO: Crear mecanismo de alerta *)
-Return[$Failed];
-]
-];
-
-(* Returns the trace of the computation and the result of whether the machine accepts the inputString *)
-DFACompute[dfa_Association,inputString_]:=Block[{computation,result},
-computation = FoldList[
-DFAIterate[dfa["Transitions"],#1["Node"],#2,"Trace"->True]&,
-<|"Node"->dfa["StartState"]|>,
-inputString
-];
-result = MemberQ[dfa["AcceptStates"],Last[computation]["Node"]];
-Return[{computation,result}]
-];
-
-
-(* ::Text:: *)
-(*Plotting functions*)
-
-
-(* ::Input::Initialization:: *)
-Options[DFAExecutionPlot] = {"SimpleNodes"->False};
-DFAExecutionPlot[dfa_Association,inputString_,OptionsPattern[]]:=DynamicModule[{trace,executionSteps,ruleIndexes,graphData,startTag,acceptTags},
-trace = DFACompute[dfa,inputString];
-executionSteps = Drop[First[trace],1];
-ruleIndexes = Map[Position[dfa["Transitions"],#]&,executionSteps];
-
-If[OptionValue["SimpleNodes"],
-graphData = Cases[dfa["Transitions"],KeyValuePattern[{"Parent"->p_,"Node"->n_,"InputSymbol"->i_}]:>Labeled[p->n,i]];
-startTag = dfa["StartState"]->Red;
-acceptTags = Map[#->Green&,dfa["AcceptStates"]];
-,
-graphData = Cases[dfa["Transitions"],KeyValuePattern[{"Parent"->p_,"Node"->n_,"InputSymbol"->i_}]:>Labeled[NameTag[dfa,p]->NameTag[dfa,n],i]];
-startTag = NameTag[dfa,dfa["StartState"]]->Red;
-acceptTags = Map[NameTag[dfa,#]->Green&,dfa["AcceptStates"]];
-];
-
-Manipulate[
-Column[
-{
-Row[{"Input string: ",Grid[{inputString},Frame->All,Background->{i->Green}]}],
-Row[{"Result: ",If[Last[trace],"Accepted","Not accepted"]}],
-Graph[
-MapAt[Style[#,Red]&,graphData,ruleIndexes[[i]]],
-ImageSize->400,
-VertexLabels->"Name",
-VertexStyle->Join[{startTag},acceptTags],
-VertexSize->0.1
-]
-}
-]
-,
-{i,1,Length[ruleIndexes],1}
-]
-];
-
-
-(* ::Subsection:: *)
-(*Non-deterministic Finite Automata (NFA)*)
-
-
-(* ::Text:: *)
-(*NFA[name, transitions, start, accept, stateExpr] create an NFA from a transition list.*)
-(*NFAIterate[transitions, state, inputSymbol] get the next step in the computation of the NFA for a inputSymbol.*)
-(*NFACompute[nfa, inputString] compute if input is recognized by nfa.*)
-(**)
-(*NFASimplify[nfa] tries to simplify the structure of nfa by removing unnecesary nodes.*)
-(*NFAUnion[nfa1, nfa2] perform the regular operation union.*)
-(*NFAConcatention[nfa1, nfa2] perform the regular operation concatenation.*)
-(*NFAStar[fa] perform the regular operation kleene star.*)
-(*NFAToDFA[nfa] convert a NFA to a DFA by traversing every posible computation and transforming group of NFA states into a single DFA state.*)
-(**)
-(*NFAExecutionTreeComputeTrace[nfa, inputString] return the trace of the computation performed by nfa.*)
-(*NFAExecutionTree[nfa, inputString] return the execution tree of the computation performed by nfa.*)
-(*NFAExecutionPlot[nfa, inputString] return a dynamic execution plot of the computation performed by nfa.*)
-
-
-(* ::Subsection:: *)
-(*NFA Implementation*)
-
-
-(* ::Input::Initialization:: *)
-NFA[name_,transitions_,start_,accept_,stateExpr_:{}]:=
-<|
-"Name"->name,
-"Type"->"NFA",
-"Transitions"->transitions,
-"StartState"->start,
-"AcceptStates"->accept ,
-"StateExpressions"->stateExpr
-|>;
-
-ContainsQ[list_List,form_]:=MemberQ[list,form];
-ContainsQ[form1_,form2_]:=(form1===form2);
-
-PureNondetStateQ[transitions_,state_]:=(DeleteDuplicates[FATransitions[transitions,state][[All,"InputSymbol"]]] === {\[Epsilon]});
-
-(* Return the list of nodes accesible via empty transitions *)
-NFANondetNodes[transitions_,state_Association]:=Cases[FATransitions[transitions,state["Node"]],KeyValuePattern[{"InputSymbol"->i_/;ContainsQ[i,\[Epsilon]]}]];
-NFANondetNodes[transitions_,state_Integer]:=Cases[FATransitions[transitions,state],KeyValuePattern[{"InputSymbol"->i_/;ContainsQ[i,\[Epsilon]]}]];
-NFANondetNodes[transitions_,state_List]:=DeleteDuplicates[Flatten[Map[NFANondetNodes[transitions,#]&,state]]];
-NFANondetNodesRecursive[transitions_,states_] := FixedPoint[DeleteDuplicates[Join[#,NFANondetNodes[transitions,#[[All,"Node"]]]]]&,states];
-
-Options[NFAIterate]={"Trace"->False};
-NFAIterate[transitions_,state_?AtomQ,inputSymbol_,OptionsPattern[]]:=Block[{next,deterministicTransitions,forkTransitions,deterministicNodes,emptyTransition},
-(* Get all the transitions corresponding to a DFA *)
-deterministicTransitions = Cases[FATransitions[transitions,state],KeyValuePattern[{"InputSymbol"->i_/;MemberQ[i,inputSymbol]}]];
-deterministicNodes = Sort[DeleteDuplicates[deterministicTransitions[[All,"Node"]]]];
-
-(* Run through the empty transitions of the DFA nodes *)
-forkTransitions = NFANondetNodes[transitions,deterministicNodes]; (* Get past the current deterministic nodes *)
-forkTransitions = NFANondetNodesRecursive[transitions,forkTransitions]; (* Append every valid nondet transition *)
-
-(* The next nodes will be a union between the deterministic transitions and the nodes reachable from nondet transitions *)
-next = DeleteDuplicates[Join[deterministicTransitions,forkTransitions]];
-
-If[Length[next]>0,
-If[OptionValue["Trace"],
-Return[next],
-Return[next[[All,"Node"]]]
-]
-,
-Return[{}]
-];
-];
-NFAIterate[transitions_,state_List,inputSymbol_,opt:OptionsPattern[]]:=DeleteDuplicates[Flatten[Map[NFAIterate[transitions,#,inputSymbol,opt]&,state]]];
-
-NFACompute[nfa_Association,inputString_]:=Block[{computation,result,start},
-start = NFANondetNodesRecursive[
-nfa["Transitions"],
-{<|"Node"->nfa["StartState"]|>}
-];
-computation = FoldList[
-NFAIterate[nfa["Transitions"],#1[[All,"Node"]],#2,"Trace"->True]&,
-start,
-inputString
-];
-result = Apply[Or,Map[MemberQ[nfa["AcceptStates"],#]&,Last[computation][[All,"Node"]]]];
-Return[{computation,result}];
-];
-
-
-(* ::Input::Initialization:: *)
-TransitionApplyThreshold[transition_,threshold_]:=MapAt[#+threshold&,transition,{{Key["Parent"]},{Key["Node"]}}];
-MachineApplyThreshold[fa_Association,threshold_]:=<|
-"Name"->fa["Name"],
-"Transitions"->Map[TransitionApplyThreshold[#,threshold]&,fa["Transitions"]],
-"StartState"->fa["StartState"]+threshold,
-"AcceptStates"->fa["AcceptStates"]+threshold,
-"StateExpressions"->If[Length[fa["StateExpressions"]]!= 0,MapAt[#+threshold&,fa["StateExpressions"],{All,1}],{}]
-|>;
-
-
-(* ::Input::Initialization:: *)
-GetDirectSuccesors[fa_,state_]:=Select[
-Nest[NFANondetNodes[fa["Transitions"],#]&,{state},2],
-(!ContainsQ[fa["AcceptStates"],#["Parent"]] &&PureNondetStateQ[fa["Transitions"],#["Parent"]] && Length[FAParents[fa["Transitions"],#["Parent"]]]==1)
-&
-];
-
-ReplaceKey[assoc_,key_,replaceTo_]:=MapAt[replaceTo&,assoc,Key[key]];
-
-DeleteIntermediateTransition[transitions_,startState_,endState_]:=Block[{deleteState,replacement,newTransitions,cleanedUp},
-deleteState = endState["Parent"];
-replacement = ReplaceKey[endState,"Parent",startState["Node"]];
-cleanedUp = DeleteCases[transitions,KeyValuePattern["Parent"->deleteState]];
-cleanedUp = DeleteCases[cleanedUp,KeyValuePattern["Node"->deleteState]];
-
-newTransitions = Append[cleanedUp,replacement];
-Return[newTransitions];
-];
-
-SimplifyStateIteration[nfa_,state_]:=Block[{newMachine,newTransitions},
-newMachine = nfa;
-newTransitions = Fold[
-DeleteIntermediateTransition[#1,<|"Node"->state|>,#2]&,
-nfa["Transitions"],
-GetDirectSuccesors[nfa,state]
-];
-newMachine["Transitions"] = newTransitions;
-Return[newMachine];
-];
-SimplifyState[nfa_,state_]:=FixedPoint[SimplifyStateIteration[#,state]&,nfa];
-
-NFASimplify[nfa_]:=Block[{simplified,oldStates,newStates,stateRelabelRule = {}},
-simplified = Fold[SimplifyState,nfa,GetStates[nfa["Transitions"]]];
-
-oldStates = GetStates[simplified["Transitions"]];
-newStates = Range[0,Length[oldStates]-1];
-stateRelabelRule = Thread[oldStates->newStates];
-
-simplified["Transitions"] = DeleteDuplicates[MapAt[Replace[#,stateRelabelRule]&,simplified["Transitions"],{{All,Key["Parent"]},{All,Key["Node"]}}]];
-simplified["StartState"] = Replace[simplified["StartState"],stateRelabelRule];
-simplified["AcceptStates"] = ReplaceAll[simplified["AcceptStates"],stateRelabelRule];
-If[Length[simplified["StateExpressions"]]!= 0,
-simplified["StateExpressions"] = MapAt[Replace[#,stateRelabelRule]&,simplified["StateExpressions"],{All,1}];
-];
-Return[simplified];
-];
-
-
-(* ::Input::Initialization:: *)
-NFAUnion[nfa1_Association,nfa2_Association]:=Block[{minIndex,newIndexThreshold,newM1,newM2,newAccept,newTransitions,newMachine,newStateExpressions},
-minIndex = Min[nfa1["Transitions"][[All,"Parent"]]];
-newIndexThreshold = Max[nfa1["Transitions"][[All,"Node"]]]+1;
-newM1 = MachineApplyThreshold[nfa1,1];
-newM2 = MachineApplyThreshold[nfa2,newIndexThreshold+1];
-newAccept = Sort[Join[newM1["AcceptStates"],newM2["AcceptStates"]]];
-newTransitions = {EmptyTransition[minIndex,newM1["StartState"]], EmptyTransition[minIndex,newM2["StartState"]]};
-newStateExpressions = SortBy[Join[newM1["StateExpressions"],newM2["StateExpressions"]],First];
-
-newMachine = <|
-"Name"->StringJoin[nfa1["Name"],"\[Union]",nfa2["Name"]],
-"Type"->"NFA",
-"Transitions"->Join[newM1["Transitions"],newM2["Transitions"],newTransitions],
-"StartState"->minIndex,
-"AcceptStates"->newAccept,
-"StateExpressions"->newStateExpressions
-|>;
-Return[newMachine];
-];
-NFAUnion[nfas__/;Length[List[nfas]]>2]:=Fold[NFAUnion,First[List[nfas]],Rest[List[nfas]]];
-
-
-(* ::Input::Initialization:: *)
-NFAConcatention[nfa1_Association,nfa2_Association]:=Block[{newIndexThreshold,newM2,newTransitions,newMachine,newStateExpressions},
-newIndexThreshold = Max[nfa1["Transitions"][[All,"Node"]]]+1;
-newM2 = MachineApplyThreshold[nfa2,newIndexThreshold];
-
-newTransitions = Map[EmptyTransition[#,newM2["StartState"]]&,nfa1["AcceptStates"]];
-
-newStateExpressions = Join[nfa1["StateExpressions"],newM2["StateExpressions"]];
-newStateExpressions = If[Length[newStateExpressions]!= 0,SortBy[Join[nfa1["StateExpressions"],newM2["StateExpressions"]],First],{}];
-
-newMachine = <|
-"Name"->StringJoin[nfa1["Name"],nfa2["Name"]],
-"Type"->"NFA",
-"Transitions"->Join[nfa1["Transitions"],newM2["Transitions"],newTransitions],
-"StartState"->nfa1["StartState"],
-"AcceptStates"->newM2["AcceptStates"],
-"StateExpressions"->newStateExpressions
-|>;
-Return[newMachine];
-];
-NFAConcatention[fas__/;Length[List[fas]]>2]:=Fold[NFAConcatention,First[List[fas]],Rest[List[fas]]];
-
-
-(* ::Input::Initialization:: *)
-NFAStar[nfa_Association]:=Block[{minIndex,newM,newTransitions,newAccept,newFA},
-minIndex = Min[nfa["Transitions"][[All,"Parent"]]];
-newM = MachineApplyThreshold[nfa,1];
-newTransitions = Join[{EmptyTransition[minIndex,newM["StartState"]]},Map[EmptyTransition[#,newM["StartState"]]&,newM["AcceptStates"]]];
-newAccept = Append[newM["AcceptStates"],minIndex];
-
-newFA = <|
-"Name"->StringJoin["(",nfa["Name"],"\!\(\*SuperscriptBox[\()\), \(*\)]\)"],
-"Type"->"NFA",
-"Transitions"->Join[newM["Transitions"],newTransitions],
-"StartState"->minIndex,
-"AcceptStates"->newAccept,
-"StateExpressions"->newM["StateExpressions"]
-|>;
-Return[newFA];
-];
-
-
-(* ::Input::Initialization:: *)
-(* Check if there is at least one of the accepted states in searchState *)
-ContainsStateQ[stateList_,searchState_?AtomQ]:=MemberQ[stateList,searchState];
-ContainsStateQ[stateList_,searchState_List]:=Apply[Or,Map[MemberQ[stateList,#]&,searchState]];
-
-(* Get parents of the current state *)
-FAParents[transitions_,state_]:=DeleteDuplicates[Cases[transitions,KeyValuePattern[{"Node"->state}]][[All,"Parent"]]];
-
-(* Check if the state is inaccesible *)
-JunkStateQ[transitions_,start_,state_]:=Block[{stateParents,nonSelfTransitions},
-If[ContainsStateQ[start,state],Return[False]];
-stateParents = FAParents[transitions,state];
-nonSelfTransitions = Complement[stateParents,{state}];
-If[Length[nonSelfTransitions]==0,
-Return[True],
-Return[False]
-]
-];
-
-SafeSort[l_List]:=Sort[l];
-SafeSort[l_?AtomQ]:=l;
-
-(* Infer the alphabet from the transition list *)
-GetAlphabet[transitions_]:=DeleteCases[DeleteDuplicates[Flatten[transitions[[All,"InputSymbol"]]]],\[Epsilon]];
-
-(* Infer the states from the transition list *)
-GetStates[transitions_]:=Sort[DeleteDuplicates[Flatten[Cases[transitions,KeyValuePattern[{"Parent"->p_,"Node"->n_}]:>{p,n}]]]];
-
-(* Get the states reachable from the current states list *)
-Explore[transitions_,states_]:=Map[
-Transition[
-SafeSort[states],
-SafeSort[DeleteDuplicates[NFAIterate[transitions,states,#,"Trace"->False]]],
-{#}]&,
-GetAlphabet[transitions]
-];
-
-(* Explore one step down each branch of the computation and append it to the explored branches list *)
-StepDown[transitions_,branches_]:=DeleteDuplicates[
-Flatten[
-Join[
-branches,
-Map[
-Explore[
-transitions,
-#["Node"]
-]&,
-branches
-]
-],
-1]
-];
-
-NewStateNode[node_,newStateRules_]:=
-<|
-"Parent"->Replace[node["Parent"],newStateRules],
-"Node"->Replace[node["Node"],newStateRules],
-"InputSymbol"->node["InputSymbol"]
-|>;
-
-
-(* ::Input::Initialization:: *)
-NFAToDFA[nfa_Association]:=Block[{protoDFA,start,protoDFAStates,newStateRules,newStates,containsAccept,newFA,newAccept,newStart,newTransitions,newTransitionsCleanedUp,protoDFAExpressionNodes,newStateExpressionsNodes},
-If[nfa["Type"] =!= "NFA",Return[$Failed]];
-
-(* Explore all paths until there is no unexplored transition *)
-start = 
-FixedPoint[
-DeleteDuplicates[
-Join[
-#,
-NFANondetNodes[nfa["Transitions"],#[[All,"Node"]]]]
-]&,
-{<|"Node"->nfa["StartState"]|>}
-];
-
-(* Make a DFA by exploring all possible paths in the NFA *)
-protoDFA = FixedPoint[StepDown[nfa["Transitions"],#]&,{<|"Node"->start[[All,"Node"]]|>}];
-protoDFAStates = DeleteDuplicates[Join[Drop[protoDFA,1][[All,"Parent"]],Drop[protoDFA,1][[All,"Node"]]]];
-
-(* Match old NFA parameters to the new DFA *)
-newStateRules = Thread[protoDFAStates->Range[Length[protoDFAStates]]];
-newStates =newStateRules[[All,2]];
-containsAccept = Position[protoDFAStates,s_/;ContainsStateQ[s,nfa["AcceptStates"]]];
-newAccept = Extract[newStates,containsAccept];
-newStart = Replace[First[protoDFAStates],newStateRules];
-newTransitions = Map[NewStateNode[#,newStateRules]&,Drop[protoDFA,1]];
-newTransitionsCleanedUp = DeleteDuplicates[DeleteCases[newTransitions,t_/; JunkStateQ[newTransitions,newStart,t["Node"]]]];
-
-protoDFAExpressionNodes = Concatenate[
-Map[
-Thread[Cases[protoDFAStates,s_/;ContainsStateQ[s,First[#]]]->Last[#]]&,
-nfa["StateExpressions"]
-]
-];
-If[Length[protoDFAExpressionNodes]!=0,
-newStateExpressionsNodes = MapAt[Replace[#,newStateRules]&,protoDFAExpressionNodes,{All,1}]
-,
-newStateExpressionsNodes = {}
-];
-
-newFA = <|
-"Name"->nfa["Name"],
-"Type"->"DFA",
-"Transitions"->newTransitionsCleanedUp,
-"StartState"->newStart,
-"AcceptStates"->newAccept,
-"StateExpressions"->newStateExpressionsNodes
-|>;
-Return[newFA];
-];
-
-
-(* ::Text:: *)
-(*Plotting functions*)
-
-
-(* ::Input::Initialization:: *)
-(* Pretty output for NFAExecutionTree *)
-GenerationTransform[node_Association,generation_]:={
-StringJoin["G: ",ToString[generation-1]," S: ",ToString[node["Parent"]]]->StringJoin["G: ",ToString[generation]," S: ",ToString[node["Node"]]]
-,
-ToString[node["InputSymbol"]]
-};
-GenerationTransform[nodes_List,generation_]:=Map[GenerationTransform[#,generation]&,nodes];
-
-NFAReplaceParents[transitions_,newParent_]:=Map[MapAt[newParent&,#,Key["Parent"]]&,transitions];
-
-NFAExecutionTreeIterate[transitions_,state_?AtomQ,inputSymbol_]:=Block[{next,deterministicTransitions,forkTransitions,deterministicNodes,emptyTransition},
-deterministicTransitions = Cases[FATransitions[transitions,state],KeyValuePattern[{"InputSymbol"->i_/;MemberQ[i,inputSymbol]}]];
-deterministicNodes = Sort[DeleteDuplicates[deterministicTransitions[[All,"Node"]]]];
-
-forkTransitions = NFANondetNodes[transitions,deterministicNodes];
-forkTransitions = NFANondetNodesRecursive[transitions,forkTransitions];
-forkTransitions = NFAReplaceParents[forkTransitions,state]; (* This is the only difference from NFAIterate *)
-
-next = DeleteDuplicates[Join[deterministicTransitions,forkTransitions]];
-
-If[Length[next]>0,Return[next],Return[{}]];
-];
-NFAExecutionTreeIterate[transitions_,state_List,inputSymbol_]:=DeleteDuplicates[Flatten[Map[NFAExecutionTreeIterate[transitions,#,inputSymbol]&,state]]];
-
-NFAExecutionTreeComputeTrace[nfa_Association,inputString_]:=Block[{computation,result,start},
-start = NFANondetNodesRecursive[nfa["Transitions"],{<|"Node"->nfa["StartState"]|>}]; (* This is the only difference from NFACompute *)
-computation = FoldList[NFAExecutionTreeIterate[nfa["Transitions"],#1[[All,"Node"]],#2]&,start,inputString];
-result = Apply[Or,Map[MemberQ[nfa["AcceptStates"],#]&,Last[computation][[All,"Node"]]]];
-Return[{computation,result}];
-];
-
-(* Plot the execution tree showing the active states at every input *)
-NFAExecutionTree[nfa_Association,inputString_]:=Block[{trace,root,traceTree},
-trace = Drop[First[NFAExecutionTreeComputeTrace[nfa,inputString]],1];
-root = First[GenerationTransform[First[trace],1]];
-traceTree = Flatten[MapIndexed[GenerationTransform[#1,First[#2]]&,trace],1];
-
-TreePlot[
-DeleteDuplicates[traceTree],
-Automatic,StringJoin["G: 0 S: ",ToString[nfa["StartState"]]],
-
-VertexLabeling->True,
-DirectedEdges->True
-]
-];
-
-Options[NFAExecutionPlot] = {"SimpleNodes"->False};
-NFAExecutionPlot[nfa_Association,inputString_,OptionsPattern[]]:=DynamicModule[{trace,executionSteps,ruleIndexes,graphData,startTag,acceptTags,currentStates,start,parentStates},
-trace = NFACompute[nfa,inputString];
-executionSteps = First[trace];
-ruleIndexes = Map[Position[nfa["Transitions"],Apply[Alternatives,#]]&,executionSteps];
-currentStates = Cases[nfa["Transitions"],KeyValuePattern[{"Node"->n_}]:>n];
-parentStates = Cases[nfa["Transitions"],KeyValuePattern[{"Parent"->p_}]:>p];
-start = DeleteDuplicates[Sort[Join[{<|"Node"->nfa["StartState"]|>},NFANondetNodes[nfa["Transitions"],nfa["StartState"]]]]];
-
-If[OptionValue["SimpleNodes"],
-graphData = Cases[nfa["Transitions"],KeyValuePattern[{"Parent"->p_,"Node"->n_,"InputSymbol"->i_}]:>Labeled[p->n,i]];
-acceptTags = Map[#->Green&,nfa["AcceptStates"]];
-startTag = nfa["StartState"]->Red;
-,
-graphData = Cases[nfa["Transitions"],KeyValuePattern[{"Parent"->p_,"Node"->n_,"InputSymbol"->i_}]:>Labeled[NameTag[nfa,p]->NameTag[nfa,n],i]];
-acceptTags = Map[NameTag[nfa,#]->Green&,nfa["AcceptStates"]];
-startTag = NameTag[nfa,nfa["StartState"]]->Red;
-];
-
-Manipulate[
-Column[
-{
-Row[{"Input string: ",Grid[{inputString},Frame->All,Background->{(i-1)->Green}]}],
-Row[{"Start states: ",Sort[start[[All,"Node"]]]}],
-Row[{"Parent states: ",Sort[Extract[parentStates,ruleIndexes[[i]]]]}],
-Row[{"Current states: ",Sort[Extract[currentStates,ruleIndexes[[i]]]]}],
-Row[{"Accept states: ",nfa["AcceptStates"]}],
-Row[{"Result: ",If[Last[trace],"Accepted","Not accepted"]}],
-Graph[
-MapAt[Style[#,Red]&,graphData,ruleIndexes[[i]]],
-ImageSize->400,
-VertexLabels->"Name",
-VertexStyle->Join[{startTag},acceptTags],
-VertexSize->0.1
-]
-}
-]
-,
-{i,1,Length[ruleIndexes],1}
-]
-];
-
-
-(* ::Section:: *)
-(*Regular expressions*)
-
-
-(* ::Text:: *)
-(*A regular expression, regex or regexp  is a sequence of characters that define a search pattern. Usually this pattern is used by string searching algorithms for "find" or "find and replace" operations on strings, or for input validation. It is a technique that developed in theoretical computer science and formal language theory. In practice, regular expressions will allow us to transform raw code text into a set of tokens labeled by their type.*)
-
-
-(* ::Text:: *)
-(*This regex implementation is just a front-end to the Finite Automata operations.*)
-(**)
-(*Regex[c] creates a recognizer for the character c.*)
-(*Regex[str, tokenRecognize]  creates a recognizer for the string str which classifies it as the token tokenRecognize.*)
-(*RegexUnion[args] Perform the regular operation union. Can be applied to an arbitrary number of finite automate type arguments args.*)
-(*RegexConcatenation[args] Perform the regular operation concatenation. Can be applied to an arbitrary number of finite automate type arguments args.*)
-(*RegexStar[fa] perform the regular operation kleene star to a finite automata fa.*)
-(*RegexStar[str] perform the regular operation kleene star to a string str.*)
-(*RegexDagger[fa] perform the regular operation dagger to a finite automata fa.*)
-(*RegexDagger[str]perform the regular operation dagger to a string str.*)
-(**)
-(*RegexAlphabet[alphabet] creates a recognizer for a string containing the alphabet.*)
-(*RegexAlphabetLowercase[] lowercase alphabet wrapper.*)
-(*RegexAlphabetUppercase[] uppercase alphabet wrapper.*)
-(*RegexAlphabet[]  A...Za...z recognizer.*)
-(*RegexDigits[] 0...9 recognizer.*)
-(*RegexASCIIChars[] recognizes every char in the ASCII standard.*)
-(**)
-(*RegexCompute[fa, input] compute if input is recognized by fa, and if applicable, return the recognized token.*)
-
-
-(* ::Subsection:: *)
-(*RegEx Implementation*)
-
-
-(* ::Input::Initialization:: *)
-RegexUnion[args__]:=NFAUnion[args];
-RegexConcatenation[args__]:=NFAConcatention[args];
-RegexStar[fa_Association]:=NFAStar[fa];
-RegexStar[str_String]:=NFAStar[Regex[str]];
-RegexDagger[fa_Association]:=NFAConcatention[fa,NFAStar[fa]];
-RegexDagger[str_String]:=NFAConcatention[Regex[str],NFAStar[Regex[str]]];
-
-
-(* ::Input::Initialization:: *)
-Regex[c_String/;StringLength[c]==1]:=NFA[c,{Transition[0,1,{c}]},0,{1}];
-Regex[c_String/;StringLength[c]==1,stateExpr_]:=NFA[c,{Transition[0,1,{c}]},0,{1},{1->stateExpr}];
-Regex[str_String/;StringLength[str]>1,tokenRecognize_:""]:=Block[{m},
-m =Apply[NFAConcatention,Map[Regex,Characters[str]]];
-If[tokenRecognize!= "",
-m["StateExpressions"] =Thread[m["AcceptStates"]->tokenRecognize];
-];
-
-Return[m];
-];
-Regex[r_Association,tokenRecognize_]:=Block[{m = r},
-m["StateExpressions"] = Thread[m["AcceptStates"]->tokenRecognize];
-Return[m];
-];
-
-
-(* ::Input::Initialization:: *)
-RegexAlphabet[alphabet_]:=Block[{input,name,transitions,acceptStates,newFA},
-input = Characters[alphabet];
-newFA = <|
-"Name"->StringJoin[Riffle[input,"\[Union]"]],
-"Type"->"NFA",
-"Transitions"->Map[Transition[0,#,{input[[#]]}]&,Range[Length[input]]],
-"StartState"->0,
-"AcceptStates"->Range[Length[input]],
-"StateExpressions"->{}
-|>;
-Return[newFA];
-];
-
-RegexAlphabetLowercase[]:=RegexAlphabet[StringJoin@Alphabet[]];
-RegexAlphabetUppercase[]:=RegexAlphabet[StringJoin@ToUpperCase[Alphabet[]]];
-RegexAlphabet[]:=RegexAlphabet[StringJoin@Join[Alphabet[],ToUpperCase[Alphabet[]]]];
-RegexDigits[]:=RegexAlphabet[StringJoin@Map[ToString,Range[0,9]]];
-
-asciiChars = {"\t","\n","\f","\r"," ","!","#","$","%","&","'","(",")","*","+",",","-",".","/","0","1","2","3","4","5","6","7","8","9",":",";","<","=",">","?","@","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","[","\\","]","^","_","`","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","{","|","}","~","\.7f"};
-
-RegexASCIIChars[]:=RegexAlphabet[StringJoin@asciiChars];
-
-
-(* ::Input::Initialization:: *)
-RegexCompute[fa_,input_]:=Block[{trace,result,recognizedTokens},
-If[fa["Type"]== "NFA",
-{trace,result} = NFACompute[fa,Characters[input]];
-recognizedTokens = 
-Cases[
-Last[trace][[All,"Node"]],
-(node_ /; ContainsQ[fa["StateExpressions"][[All,1]],node]):> Replace[node,fa["StateExpressions"]]
-];
-
-,
-{trace,result} =DFACompute[fa,Characters[input]];
-recognizedTokens = 
-Cases[
-{Last[trace]["Node"]},
-(node_ /; ContainsQ[fa["StateExpressions"][[All,1]],node]):> Replace[node,fa["StateExpressions"]]
-];
-];
-
-Return[{trace,result,recognizedTokens}];
-];
-
-
-(* ::Section:: *)
 (*Lexer*)
 
 
@@ -720,15 +45,14 @@ Return[{trace,result,recognizedTokens}];
    ...
   have the same form of identifiers, so the lexer has to give precedence to the keyword token. 
  *)
-Token[symbol_String,name_String]:=<|"Symbol"->symbol,"Name"->name|>;
-CreateTokens[list_]:=Map[Token[#[[1]],#[[2]]]&,list];
-CreateTokenRecognizer[tokenList_]:=NFAToDFA[Apply[RegexUnion,Map[Regex[#["Symbol"],#["Name"]]&,tokenList]]];
+CreateTokenRecognizer[tokenList_]:=Map[RegularExpression[First[#]]->Last[#]&,tokenList];
+RegexCompute[tokens_,input_]:={StringMatchQ[input,tokens[[All,1]]],StringCases[input,tokens]};
 
 
 (* ::Input::Initialization:: *)
 GetToken[input_,symbolTokens_,keywordTokens_]:=Block[{symbolAccept,symbolResult,keywordAccept,keywordResult},
-{symbolAccept,symbolResult} = Rest[RegexCompute[symbolTokens,input]];
-{keywordAccept,keywordResult} = Quiet[Rest[RegexCompute[keywordTokens,input]]];
+{symbolAccept,symbolResult} = RegexCompute[symbolTokens,input];
+{keywordAccept,keywordResult} = RegexCompute[keywordTokens,input];
 If[keywordAccept,Return[First[keywordResult]]]; (* Keywords have precedence over symbols *)
 If[symbolAccept,Return[First[symbolResult]]];
 Return[$Failed];
@@ -804,7 +128,7 @@ Return[formattedTokens];
 ];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Parser*)
 
 
@@ -1078,31 +402,27 @@ PlotParseStep[grammar,parseTrace[[i+1]]["Rule"],parseRules[[i]],parseTrace[[i+1]
 
 
 (* ::Input::Initialization:: *)
-tokenSymbols = CreateTokens[
-{
-{" ","Whitespace"},
-{"\n", "LineBreak"},
-{":", "IncompleteAssign"},
+tokenSymbols = {
+{"\\s","Whitespace"},
+{"\\r", "LineBreak"},
 {":=", "Assign"},
-{"*", "Times"},
+{"\\*", "Times"},
 {"/", "Slash"},
-{"+", "Plus"},
+{"\\+", "Plus"},
 {"-", "Minus"},
 {"=", "Equal"},
 {"#", "NotEqual"},
-{"(", "LeftParenthesis"},
-{")", "RightParenthesis"},
+{"\\(", "LeftParenthesis"},
+{"\\)", "RightParenthesis"},
 {";", "Semicolon"},
 {",", "Comma"},
-{".", "Dot"},
-{">", "Greater"},
-{">=", "GreaterOrEqual"},
-{"<", "Lower"},
-{"<=", "LowerOrEqual"}
-}
-];
-tokenKeywords = CreateTokens[
-{
+{"\\>", "Greater"},
+{"\\>=", "GreaterOrEqual"},
+{"\\<", "Lower"},
+{"\\<=", "LowerOrEqual"},
+{".", "Dot"}
+};
+tokenKeywords = {
 {"const", "Const"},
 {"var", "Var"},
 {"procedure", "Procedure"},
@@ -1118,8 +438,7 @@ tokenKeywords = CreateTokens[
 {"while", "While"},
 {"do", "Do"},
 {"odd", "Odd"}
-}
-];
+};
 
 
 (* ::Subsection:: *)
@@ -1131,17 +450,13 @@ tokenKeywords = CreateTokens[
 
 
 (* ::Input::Initialization:: *)
-Print["Initializing tokenizer..."];
 tokenSymbolsRecognizer = CreateTokenRecognizer[tokenSymbols];
 keywordRecognizer = CreateTokenRecognizer[tokenKeywords];
 
-identifierRegex =RegexConcatenation[RegexAlphabet[],RegexStar[RegexUnion[RegexAlphabet[],RegexDigits[]]]];
-numberLiteralRegex = RegexConcatenation[RegexDigits[],RegexStar[RegexDigits[]]];
+identifierRegex ={RegularExpression["^[a-zA-Z]+[_\\da-zA-Z]*$"]->"Identifier"};
+numberLiteralRegex = {RegularExpression["\\d+"]->"NumberLiteral"};
 
-identifierRecognizer = Regex[identifierRegex,"Identifier"];
-numberLiteralRecognizer = Regex[numberLiteralRegex,"NumberLiteral"];
-symbolRecognizer= RegexUnion[identifierRecognizer,numberLiteralRecognizer,tokenSymbolsRecognizer];
-Print["Done."];
+symbolRecognizer= Join[identifierRegex,numberLiteralRegex,tokenSymbolsRecognizer];
 
 
 (* ::Section:: *)
@@ -1814,6 +1129,7 @@ Store <multiply::n1>
 JumpZero <multiply::end_loop>
 Jump <multiply::begin_loop>
 Label <multiply::end_loop>
+LoadA <multiply::result>
 Return
 Declare <multiply::n1> 0
 Declare <multiply::n2> 0
@@ -1881,6 +1197,8 @@ icToAsmRules = {
 {"divide",out_,l_/;IsLabelQ[l],n_/;!IsLabelQ[n]}:>{{"LoadA",l},{"Store","<divide::n1>"},{"SetA",n},{"Store","<divide::n2>"},{"Call","<divide>"},{"Store",out}},
 {"divide",out_,n_/;!IsLabelQ[n],l_/;IsLabelQ[l]}:>{{"SetA",n},{"Store","<divide::n1>"},{"LoadA",l},{"Store","<divide::n2>"},{"Call","<divide>"},{"Store",out}}
 };
+
+Concatenate[l_]:=Apply[Join,l];
 CompileICToASM[ic_]:=Block[{splitted,replaced,generatedCode},
 splitted = Map[StringSplit,StringSplit[ic,"\n"]];
 replaced = ReplaceAll[splitted,icToAsmRules];

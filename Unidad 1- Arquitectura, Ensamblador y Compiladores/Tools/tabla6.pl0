@@ -1,0 +1,15 @@
+var n,x;
+procedure tablaSeis;
+begin
+    n := 0;
+    x := 0;
+    while n < 9 do
+    begin
+        n := n + 1;
+        x := 6 * n;
+        print x
+    end
+end
+begin
+    call tablaSeis
+end.
