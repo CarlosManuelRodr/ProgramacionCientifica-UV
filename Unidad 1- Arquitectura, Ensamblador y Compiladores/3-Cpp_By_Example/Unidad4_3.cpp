@@ -12,10 +12,10 @@ using namespace std;
 int main()
 {
     // Creamos un vector para que guarde los valores de la grafica de seno.
-    vector<Coord> data;
+    vector<Vector2> data;
     for(double i = 0; i< 6.28; i += 0.01)
     {
-        data.push_back(Coord(i,sin(i)));
+        data.push_back(Vector2(i,sin(i)));
     }
 
     // Grafica

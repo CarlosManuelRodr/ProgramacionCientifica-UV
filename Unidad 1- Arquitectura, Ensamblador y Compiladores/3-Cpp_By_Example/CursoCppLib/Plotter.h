@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 #include "BmpWriter.h"
 #include "Matrix.h"
 
