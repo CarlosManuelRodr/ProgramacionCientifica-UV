@@ -58,4 +58,4 @@ Problema reto (puntos extra para todos)
 =======================================
 - Crear un videojuego de 3 en raya (conocido popularmente como "gato"), donde el usuario compita contra la máquina. (Tip: La manera más eficiente de lograr esto es a través del algoritmo Minimax).
 
-- Programar "El juego de la vida" de Conway utilizando un mapa de 512x512 celdas. El mapa se inicializa con valores aleatorios, y debe mostrar la evolución durante 100 generaciones.
+- Programar "El juego de la vida" de Conway utilizando un mapa de 512x512 celdas. El mapa se inicializa con valores aleatorios, y debe mostrar la evolución durante 100 generaciones. Las fronteras son periódicas.
