@@ -1,0 +1,1689 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     62429,       1680]
+NotebookOptionsPosition[     59825,       1590]
+NotebookOutlinePosition[     60162,       1605]
+CellTagsIndexPosition[     60119,       1602]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Algoritmo simple de compresi\[OAcute]n de audio", "Title",
+ CellChangeTimes->{{3.6548277026485815`*^9, 3.654827708317961*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Autor: Carlos Manuel Rodr\[IAcute]guez Mart\[IAcute]nez", "Subsection",
+ CellChangeTimes->{{3.654833200307118*^9, 3.6548332061978083`*^9}}],
+
+Cell["\<\
+En este notebook se muestra un ejemplo simple de algoritmo de compresi\
+\[OAcute]n que funciona tomando muestras de un archivo de audio, y elimando \
+las frecuencias m\[AAcute]s altas de la transformada de Fourier de las \
+muestras.\
+\>", "Text",
+ CellChangeTimes->{{3.6548332111509886`*^9, 3.6548332775425396`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Funciones globales", "Chapter",
+ CellChangeTimes->{{3.6647223710877943`*^9, 3.6647223780412836`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"WriteFloatList", "[", 
+    RowBox[{"l_", ",", "file_"}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"Quiet", "[", 
+       RowBox[{"DeleteFile", "[", "file", "]"}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"BinaryWrite", "[", 
+       RowBox[{"file", ",", "l", ",", "\"\<Real32\>\""}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Close", "[", "file", "]"}], ";"}]}], "\[IndentingNewLine]", 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"CreateUncompressed", "[", "file_", "]"}], ":=", " ", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "audio", "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"path", " ", "=", " ", 
+       RowBox[{"NotebookDirectory", "[", "]"}]}], ";", "\[IndentingNewLine]", 
+      
+      RowBox[{"audio", " ", "=", " ", 
+       RowBox[{"Import", "[", 
+        RowBox[{"path", " ", "<>", " ", "file"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"samplerate", " ", "=", " ", 
+       RowBox[{"audio", "[", 
+        RowBox[{"[", 
+         RowBox[{"1", ",", "2"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+      
+      RowBox[{"WriteFloatList", "[", 
+       RowBox[{
+        RowBox[{"audio", "[", 
+         RowBox[{"[", 
+          RowBox[{"1", ",", "1", ",", "1"}], "]"}], "]"}], ",", 
+        RowBox[{"path", "<>", "\"\<uncompressed.bin\>\""}]}], "]"}], ";"}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.664722385025724*^9, 3.664722388782363*^9}, {
+  3.6647224355013933`*^9, 3.664722481878356*^9}, {3.664722722862873*^9, 
+  3.6647227546300325`*^9}, {3.6647228529012847`*^9, 3.664722890052025*^9}, {
+  3.6647230893289857`*^9, 3.6647230930003004`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Estudio de las distribuciones de frecuencia", "Chapter",
+ CellChangeTimes->{{3.6647289066527677`*^9, 3.6647289288638763`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"CreateUncompressed", "[", "\"\<kk.wav\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"audio", "=", " ", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{"path", "<>", "\"\<uncompressed.bin\>\""}], ",", 
+     "\"\<Real32\>\""}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samplesize", " ", "=", " ", "samplerate"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samples", " ", "=", " ", 
+   RowBox[{"Partition", "[", 
+    RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fouriersamples", " ", "=", " ", 
+   RowBox[{"ParallelTable", "[", 
+    RowBox[{
+     RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "samples"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlot", "[", 
+  RowBox[{
+   RowBox[{"fouriersamples", "[", 
+    RowBox[{"[", 
+     RowBox[{"1", ";;", "10"}], "]"}], "]"}], ",", 
+   RowBox[{"PlotRange", "->", "Full"}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"Histogram", "[", 
+  RowBox[{
+   RowBox[{"Flatten", "[", "fouriersamples", "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "0.15"}], ",", "0.15", ",", "0.01"}], "}"}], ",", 
+   "\"\<Probability\>\""}], "]"}]}], "Input",
+ CellChangeTimes->{{3.66475736321362*^9, 3.664757364039652*^9}, 
+   3.664757915355176*^9}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"threshold", " ", "=", " ", "0.03"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"newFourierSamples", " ", "=", " ", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Abs", "[", "i", "]"}], ">", "threshold"}], ",", "i", ",", 
+         "0"}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "j"}], "}"}]}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"j", ",", "fouriersamples"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samples", " ", "=", " ", 
+   RowBox[{"ParallelTable", "[", 
+    RowBox[{
+     RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "newFourierSamples"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"restoredaudio", " ", "=", " ", 
+   RowBox[{"Flatten", "[", "samples", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"ListPlay", "[", 
+    RowBox[{"restoredaudio", ",", " ", 
+     RowBox[{"SampleRate", "\[Rule]", "samplerate"}]}], "]"}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", "\"\<Entrop\[IAcute]a original\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"N", "[", 
+  RowBox[{"Entropy", "[", 
+   RowBox[{"Flatten", "[", "fouriersamples", "]"}], "]"}], 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", "\"\<Entrop\[IAcute]a del comprimido\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"N", "[", 
+  RowBox[{"Entropy", "[", 
+   RowBox[{"Flatten", "[", "newFourierSamples", "]"}], "]"}], "]"}]}], "Input",\
+
+ CellChangeTimes->{{3.6647589973053102`*^9, 3.664758997413044*^9}, 
+   3.664759528933035*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Estudiar", " ", "las", " ", "frecuencias", " ", "borradas"}], " ",
+    "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"threshold", " ", "=", " ", "0.03"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"audio", "=", " ", 
+     RowBox[{"BinaryReadList", "[", 
+      RowBox[{
+       RowBox[{"path", "<>", "\"\<uncompressed.bin\>\""}], ",", 
+       "\"\<Real32\>\""}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samplesize", " ", "=", " ", "samplerate"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samples", " ", "=", " ", 
+     RowBox[{"Partition", "[", 
+      RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"fouriersamples", " ", "=", " ", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "samples"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"deletedFreq", " ", "=", " ", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"DeleteCases", "[", 
+        RowBox[{
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"fouriersamples", "[", 
+                RowBox[{"[", 
+                 RowBox[{"i", ",", "j"}], "]"}], "]"}], "]"}], "<", 
+              "threshold"}], ",", "j"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"j", ",", "1", ",", 
+             RowBox[{"Length", "[", 
+              RowBox[{"fouriersamples", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], "]"}]}], "}"}]}], "]"}], ",", 
+         "Null"}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "1", ",", 
+         RowBox[{"Length", "[", "fouriersamples", "]"}]}], "}"}]}], "]"}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"deletedDist", "=", 
+     RowBox[{"Flatten", "[", "deletedFreq", "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"deltbl", " ", "=", " ", 
+     RowBox[{
+      RowBox[{"ParallelTable", "[", 
+       RowBox[{
+        RowBox[{"Count", "[", 
+         RowBox[{"deletedDist", ",", "i"}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "samplerate"}], "}"}]}], "]"}], "/", 
+      RowBox[{"Length", "[", "samples", "]"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"ListPlot", "[", 
+    RowBox[{"deltbl", ",", 
+     RowBox[{"PlotRange", "\[Rule]", "Full"}], ",", " ", 
+     RowBox[{"PlotTheme", "\[Rule]", "\"\<Scientific\>\""}], ",", " ", 
+     RowBox[{"FrameLabel", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"\"\<Frecuencia\>\"", ",", "\"\<Porcentaje borrado\>\""}], 
+       "}"}]}]}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.664758991099921*^9, 3.6647590210251207`*^9}, {
+   3.664759559406486*^9, 3.6647595811452312`*^9}, {3.6647596492978287`*^9, 
+   3.664759674602654*^9}, 3.664759724759489*^9, 3.6647599164879827`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Encontrar", " ", "ajuste", " ", "de", " ", "prob", " ", "frec", " ", 
+    "borrada", " ", "respecto", " ", "a", " ", "frec"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"deltbl", " ", "=", " ", 
+     RowBox[{
+      RowBox[{"ParallelTable", "[", 
+       RowBox[{
+        RowBox[{"Count", "[", 
+         RowBox[{"deletedDist", ",", "i"}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "samplerate"}], "}"}]}], "]"}], "/", 
+      RowBox[{"Length", "[", "samples", "]"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"model", " ", "=", " ", 
+     RowBox[{"1", "-", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", "a"}], " ", "x"}], "]"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"fit", " ", "=", " ", 
+     RowBox[{"FindFit", "[", 
+      RowBox[{"deltbl", ",", "model", ",", 
+       RowBox[{"{", "a", "}"}], ",", "x"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"modelf", "=", 
+     RowBox[{"Function", "[", 
+      RowBox[{
+       RowBox[{"{", "x", "}"}], ",", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"model", "/.", "fit"}], "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Show", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"ListPlot", "[", 
+      RowBox[{"deltbl", ",", 
+       RowBox[{"PlotRange", "\[Rule]", "Full"}], ",", " ", 
+       RowBox[{"PlotTheme", "\[Rule]", "\"\<Scientific\>\""}], ",", " ", 
+       RowBox[{"FrameLabel", "\[Rule]", 
+        RowBox[{"{", 
+         RowBox[{"\"\<Frecuencia\>\"", ",", "\"\<Porcentaje borrado\>\""}], 
+         "}"}]}]}], "]"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"Plot", "[", 
+      RowBox[{
+       RowBox[{"modelf", "[", "x", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"x", ",", "0", ",", "samplerate"}], "}"}]}], "]"}]}], 
+    "\[IndentingNewLine]", "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.664731188124523*^9, 3.6647312350884247`*^9}, {
+   3.664759826939158*^9, 3.664759838116091*^9}, {3.66475986829844*^9, 
+   3.664759894998019*^9}, 3.6647599421435347`*^9, {3.664759980697645*^9, 
+   3.664760011112269*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Comprimir", " ", "audio"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"audio", "=", " ", 
+     RowBox[{"BinaryReadList", "[", 
+      RowBox[{
+       RowBox[{"path", "<>", "\"\<uncompressed.bin\>\""}], ",", 
+       "\"\<Real32\>\""}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samplesize", " ", "=", " ", "samplerate"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samples", " ", "=", " ", 
+     RowBox[{"Partition", "[", 
+      RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"fouriersamples", " ", "=", " ", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "samples"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"threshold", " ", "=", " ", "0.03"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"newFourierSamples", " ", "=", " ", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"DeleteCases", "[", 
+        RowBox[{
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", "i", "]"}], ">", "threshold"}], ",", "i", 
+             ",", "Null"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "j"}], "}"}]}], "]"}], ",", "Null"}], "]"}], 
+       ",", 
+       RowBox[{"{", 
+        RowBox[{"j", ",", "fouriersamples"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Print", "[", 
+     RowBox[{"\"\<La tasa de compresi\[OAcute]n es: \>\"", " ", "<>", " ", 
+      RowBox[{"ToString", "[", 
+       RowBox[{"N", "[", 
+        RowBox[{
+         RowBox[{"Length", "[", 
+          RowBox[{"Flatten", "[", "newFourierSamples", " ", "]"}], "]"}], "/", 
+         RowBox[{"Length", "[", "audio", "]"}]}], "]"}], "]"}]}], "]"}], 
+    ";"}]}]}]], "Input",
+ CellChangeTimes->{3.664759109458165*^9, 3.6647599980034523`*^9}],
+
+Cell[BoxData["\<\"La tasa de compresi\[OAcute]n es: 0.154898\"\>"], "Print",
+ CellChangeTimes->{3.664758220415707*^9, 3.664759119252226*^9, 
+  3.6647600426457767`*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Reconstruir", " ", "se\[NTilde]al"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"NextDigit", "[", 
+      RowBox[{"f_", ",", "i_"}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"RandomVariate", "[", 
+            RowBox[{"BinomialDistribution", "[", 
+             RowBox[{"1", ",", 
+              RowBox[{"modelf", "[", "f", "]"}]}], "]"}], "]"}], "\[Equal]", 
+           "1"}], ",", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"Return", "[", "0", "]"}], ";"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"j", "\[LessEqual]", " ", 
+              RowBox[{"Length", "[", 
+               RowBox[{"newFourierSamples", "[", 
+                RowBox[{"[", "i", "]"}], "]"}], "]"}]}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"j", "++"}], ";", "\[IndentingNewLine]", 
+              RowBox[{"Return", "[", 
+               RowBox[{"newFourierSamples", "[", 
+                RowBox[{"[", 
+                 RowBox[{"i", ",", 
+                  RowBox[{"j", "-", "1"}]}], "]"}], "]"}], "]"}], ";"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"Return", "[", "Null", "]"}], ";"}]}], 
+            "\[IndentingNewLine]", "]"}], ";"}]}], "\[IndentingNewLine]", 
+         "]"}], ";"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"restoredsamples", " ", "=", " ", 
+     RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Monitor", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Do", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"j", " ", "=", " ", "1"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"reconstructedsample", "=", " ", 
+           RowBox[{"Table", "[", 
+            RowBox[{
+             RowBox[{"NextDigit", "[", 
+              RowBox[{"f", ",", "i"}], "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"f", ",", "1", ",", "samplerate"}], "}"}]}], "]"}]}], 
+          ";", "\[IndentingNewLine]", 
+          RowBox[{"reconstructedsample", " ", "=", " ", 
+           RowBox[{"DeleteCases", "[", 
+            RowBox[{"reconstructedsample", ",", "Null"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"padding", " ", "=", " ", 
+           RowBox[{"ConstantArray", "[", 
+            RowBox[{"0", ",", 
+             RowBox[{"{", 
+              RowBox[{"samplerate", "-", 
+               RowBox[{"Length", "[", "reconstructedsample", "]"}]}], "}"}]}],
+             "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"reconstructedsample", " ", "=", " ", 
+           RowBox[{"Join", "[", 
+            RowBox[{"reconstructedsample", ",", "padding"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"AppendTo", "[", 
+           RowBox[{"restoredsamples", ",", " ", "reconstructedsample"}], 
+           "]"}], ";"}], "\[IndentingNewLine]", ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "1", ",", 
+           RowBox[{"Length", "[", "newFourierSamples", "]"}]}], "}"}]}], 
+        "\[IndentingNewLine]", "]"}], ";"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"Row", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"ProgressIndicator", "[", 
+           RowBox[{"i", ",", 
+            RowBox[{"{", 
+             RowBox[{"1", ",", 
+              RowBox[{"Length", "[", "newFourierSamples", "]"}]}], "}"}]}], 
+           "]"}], ",", "i"}], "}"}], ",", "\"\< \>\""}], "]"}]}], "\n", "]"}],
+     ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samples", " ", "=", " ", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "restoredsamples"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"restoredaudio", " ", "=", " ", 
+     RowBox[{"Flatten", "[", "samples", "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Print", "[", 
+     RowBox[{"ListPlay", "[", 
+      RowBox[{"restoredaudio", ",", " ", 
+       RowBox[{"SampleRate", "\[Rule]", "samplerate"}]}], "]"}], "]"}], 
+    ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.664758232549798*^9, 3.664758238061357*^9}, {
+  3.664758270446829*^9, 3.664758270667756*^9}, {3.664758372364163*^9, 
+  3.664758400720976*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Conversi\[OAcute]n de audio a binario sin comprimir", "Chapter",
+ CellChangeTimes->{{3.6548277204880996`*^9, 3.6548277293935685`*^9}}],
+
+Cell["\<\
+Primero se crea un archivo que contiene los datos del audio sin comprimir en \
+binario.\
+\>", "Text",
+ CellChangeTimes->{{3.654833284087062*^9, 3.654833308332285*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"CreateUncompressed", "[", "\"\<kk.wav\>\"", "]"}], ";"}]], "Input",\
+
+ CellChangeTimes->{{3.6548277371279607`*^9, 3.6548277934817123`*^9}, {
+   3.6548278403317013`*^9, 3.654827841050537*^9}, {3.6548278783567414`*^9, 
+   3.654827882508754*^9}, {3.6548307451687365`*^9, 3.6548307490749483`*^9}, {
+   3.654831608144831*^9, 3.6548316096741023`*^9}, {3.6548318424867945`*^9, 
+   3.654831844595287*^9}, {3.6646720846957273`*^9, 3.664672085735035*^9}, {
+   3.6646729709553337`*^9, 3.664673025457271*^9}, {3.66467306673105*^9, 
+   3.6646730770976887`*^9}, 3.664675351872781*^9, {3.6647223931731253`*^9, 
+   3.6647223942917495`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Reproducir audio sin comprimir", "Chapter",
+ CellChangeTimes->{{3.654827895878893*^9, 3.6548279083094945`*^9}}],
+
+Cell["\<\
+Podemos reproducir el audio sin comprimir para asegurarnos de que su calidad \
+es \[OAcute]ptima.\
+\>", "Text",
+ CellChangeTimes->{{3.654833322568127*^9, 3.6548333498856297`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"audio", "=", " ", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+      "\"\<uncompressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlay", "[", 
+  RowBox[{"audio", ",", 
+   RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", 
+   RowBox[{"SampleDepth", "\[Rule]", "32"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.654827916572779*^9, 3.654827941625272*^9}, {
+   3.654827973012998*^9, 3.6548280189035435`*^9}, 3.66467509563693*^9, {
+   3.6647229277170167`*^9, 3.6647229564958067`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Algoritmo de compresi\[OAcute]n de audio", "Chapter",
+ CellChangeTimes->{{3.6548280537064953`*^9, 3.6548280687703023`*^9}}],
+
+Cell["\<\
+Primero se importa el audio sin comprimir, se decide cu\[AAcute]l va a ser el \
+tama\[NTilde]o de la muestra y qu\[EAcute] rango de frecuencias se va a \
+eliminar. Posteriormente se toma la transformada de Fourier de las muestras, \
+y se eliminan las frecuencias no deseadas. Por \[UAcute]timo se exporta la \
+lista plana de los valores de la transformada de Fourier.\
+\>", "Text",
+ CellChangeTimes->{{3.654833360307618*^9, 3.6548334590333204`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"CompressMethod1", "[", "compressioncut_", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "audio", ",", "samplesize", ",", "samples", ",", " ", "fouriersamples", 
+       ",", "compressedaudio"}], "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"audio", "=", " ", 
+       RowBox[{"BinaryReadList", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+          "\"\<uncompressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], ";",
+       "\[IndentingNewLine]", 
+      RowBox[{"samplesize", " ", "=", " ", "samplerate"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"samples", " ", "=", " ", 
+       RowBox[{"Partition", "[", 
+        RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"fouriersamples", " ", "=", " ", 
+       RowBox[{"ParallelTable", "[", 
+        RowBox[{
+         RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "samples"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"fouriersamples", " ", "=", " ", 
+       RowBox[{"fouriersamples", "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", 
+          RowBox[{"1", ";;", 
+           RowBox[{"(", 
+            RowBox[{"samplesize", "-", "compressioncut"}], ")"}]}]}], "]"}], 
+        "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"compressedaudio", " ", "=", " ", 
+       RowBox[{"Flatten", "[", "fouriersamples", "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"WriteFloatList", "[", 
+       RowBox[{"compressedaudio", ",", 
+        RowBox[{"path", "<>", "\"\<compressed.bin\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Print", "[", 
+       RowBox[{"\"\<La tasa de compresi\[OAcute]n es: \>\"", " ", "<>", " ", 
+        RowBox[{"ToString", "[", 
+         RowBox[{"N", "[", 
+          RowBox[{
+           RowBox[{"Length", "[", "compressedaudio", "]"}], "/", 
+           RowBox[{"Length", "[", "audio", "]"}]}], "]"}], "]"}]}], "]"}], 
+      ";"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CompressMethod1", "[", "30000", "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.654828098880808*^9, 3.6548281780511255`*^9}, 
+   3.654828314947237*^9, {3.6548283558736277`*^9, 3.654828356342327*^9}, {
+   3.6548284840779667`*^9, 3.6548285138801146`*^9}, 3.6548308477394733`*^9, {
+   3.654830950616112*^9, 3.654830973189759*^9}, {3.654831042431306*^9, 
+   3.6548310659955473`*^9}, {3.6548311252980194`*^9, 
+   3.6548311286827908`*^9}, {3.6548311897001686`*^9, 
+   3.6548312434580393`*^9}, {3.654831275101672*^9, 3.6548313995959897`*^9}, {
+   3.6548314531553645`*^9, 3.6548315762690105`*^9}, {3.654831715830087*^9, 
+   3.654831716267536*^9}, {3.664673140500003*^9, 3.664673222352851*^9}, {
+   3.6647229865503693`*^9, 3.664722989397663*^9}, {3.664723027277082*^9, 
+   3.664723055208909*^9}}],
+
+Cell[BoxData["\<\"La tasa de compresi\[OAcute]n es: 0.310379\"\>"], "Print",
+ CellChangeTimes->{
+  3.6647230562400885`*^9, {3.6647231182343597`*^9, 3.6647231322861633`*^9}, 
+   3.664723831081569*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Reconstrucci\[OAcute]n de audio comprimido", "Chapter",
+ CellChangeTimes->{{3.6548285567067814`*^9, 3.6548285611005845`*^9}}],
+
+Cell["\<\
+Para reconstruir el audio se rellenan los valores de la transformada de \
+Fourier que hab\[IAcute]an sido eliminados, se vuelve a tomar la trasnformada \
+de Fourier para regresar a la representaci\[OAcute]n de la onda original.\
+\>", "Text",
+ CellChangeTimes->{{3.6548334689481907`*^9, 3.654833521078586*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"DecompressMethod1", "[", "compressioncut_", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "compressedsamples", ",", "samples", ",", "restoredaudio", ",", 
+       "samplesize"}], "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"samplesize", " ", "=", " ", "samplerate"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"audio", "=", " ", 
+       RowBox[{"BinaryReadList", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+          "\"\<compressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"compressedsamples", " ", "=", " ", 
+       RowBox[{"Partition", "[", 
+        RowBox[{"audio", ",", " ", 
+         RowBox[{"samplesize", "-", "compressioncut"}]}], " ", "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"samples", " ", "=", " ", 
+       RowBox[{"ParallelTable", "[", 
+        RowBox[{
+         RowBox[{"FourierDCT", "[", 
+          RowBox[{"Join", "[", 
+           RowBox[{"i", ",", 
+            RowBox[{"ConstantArray", "[", 
+             RowBox[{"0", ",", "compressioncut"}], "]"}]}], "]"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "compressedsamples"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"restoredaudio", " ", "=", " ", 
+       RowBox[{"Flatten", "[", "samples", "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Print", "[", 
+       RowBox[{"ListPlay", "[", 
+        RowBox[{"restoredaudio", ",", " ", 
+         RowBox[{"SampleRate", "\[Rule]", "samplerate"}]}], "]"}], "]"}], 
+      ";"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"DecompressMethod1", "[", "30000", "]"}], ";"}]}], "Input",
+ CellChangeTimes->{
+  3.6548285717727137`*^9, {3.6548286049769936`*^9, 3.65482868976586*^9}, {
+   3.6548287497692738`*^9, 3.654828784606052*^9}, {3.6548306326489267`*^9, 
+   3.6548306516068916`*^9}, {3.6548309115499315`*^9, 
+   3.6548309189590807`*^9}, {3.654831424914525*^9, 3.654831444576688*^9}, 
+   3.664664014653151*^9, 3.6646640713491707`*^9, {3.664673373437166*^9, 
+   3.664673420861042*^9}, {3.6647211483980803`*^9, 3.664721175940218*^9}, {
+   3.6647231487924557`*^9, 3.6647231705052643`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Visualizaci\[OAcute]n de espectro", "Chapter",
+ CellChangeTimes->{{3.654831832271535*^9, 3.6548318367523584`*^9}, {
+  3.654832276471655*^9, 3.6548322771904125`*^9}}],
+
+Cell["\<\
+Visualizando el espectro de frecuencias se puede conocer la p\[EAcute]rdida \
+que ha sufrido el archivo de audio.\
+\>", "Text",
+ CellChangeTimes->{{3.654833547880526*^9, 3.6548335876968927`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"compressioncut", "=", " ", "30000"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samplesize", " ", "=", " ", "samplerate"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"compressedaudio", " ", "=", " ", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+      "\"\<compressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"compressedsamples", " ", "=", " ", 
+   RowBox[{"Partition", "[", 
+    RowBox[{"audio", ",", " ", 
+     RowBox[{"samplesize", "-", "compressioncut"}]}], " ", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"compressedsamples", " ", "=", " ", 
+   RowBox[{"ParallelTable", "[", 
+    RowBox[{
+     RowBox[{"FourierDCT", "[", 
+      RowBox[{"Join", "[", 
+       RowBox[{"i", ",", 
+        RowBox[{"ConstantArray", "[", 
+         RowBox[{"0", ",", "compressioncut"}], "]"}]}], "]"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "compressedsamples"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"audio", " ", "=", " ", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+      "\"\<uncompressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samples", " ", "=", " ", 
+   RowBox[{"Partition", "[", 
+    RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SetOptions", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"Plot", ",", "ListPlot", ",", "ListLinePlot"}], "}"}], ",", 
+     RowBox[{"BaseStyle", "\[Rule]", 
+      RowBox[{"FontSize", "\[Rule]", "14"}]}]}], "]"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Print", "[", 
+    RowBox[{"Periodogram", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"samples", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], ",", 
+        RowBox[{"compressedsamples", "[", 
+         RowBox[{"[", "1", "]"}], "]"}]}], "}"}], ",", 
+      RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", 
+      RowBox[{"Frame", "\[Rule]", "True"}], ",", " ", 
+      RowBox[{"GridLines", "\[Rule]", "Automatic"}], ",", " ", 
+      RowBox[{"FrameLabel", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Frecuencia (Hz)\>\"", ",", " ", "\"\<Intensidad\>\""}], 
+        "}"}]}], ",", 
+      RowBox[{"PlotLegends", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Original\>\"", ",", " ", "\"\<Comprimido\>\""}], 
+        "}"}]}]}], "]"}], "]"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Print", "[", 
+    RowBox[{"Spectrogram", "[", 
+     RowBox[{
+      RowBox[{"Flatten", "[", "samples", "]"}], ",", 
+      RowBox[{"ColorFunction", "\[Rule]", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Blend", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"White", ",", "Orange", ",", "Red", ",", "Black"}], "}"}],
+            ",", "#"}], "]"}], "&"}], ")"}]}], ",", 
+      RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", " ", 
+      RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+      RowBox[{"FrameLabel", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<t\>\"", ",", " ", "\"\<Frecuencia (Hz)\>\""}], "}"}]}], 
+      ",", 
+      RowBox[{"BaseStyle", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"FontSize", "\[Rule]", "14"}], "}"}]}], ",", " ", 
+      RowBox[{"PlotLabel", "\[Rule]", "\"\<Original\>\""}]}], "]"}], "]"}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"Spectrogram", "[", 
+    RowBox[{
+     RowBox[{"Flatten", "[", "compressedsamples", "]"}], ",", 
+     RowBox[{"ColorFunction", "\[Rule]", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Blend", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"White", ",", "Orange", ",", "Red", ",", "Black"}], "}"}], 
+          ",", "#"}], "]"}], "&"}], ")"}]}], ",", 
+     RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", " ", 
+     RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", 
+     RowBox[{"FrameLabel", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"\"\<t\>\"", ",", " ", "\"\<Frecuencia (Hz)\>\""}], "}"}]}], 
+     ",", 
+     RowBox[{"BaseStyle", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"FontSize", "\[Rule]", "14"}], "}"}]}], ",", 
+     RowBox[{"PlotLabel", "\[Rule]", "\"\<Comprimido\>\""}]}], "]"}], "]"}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.654831928372411*^9, 3.6548319798798833`*^9}, {
+   3.654832013566247*^9, 3.654832037746725*^9}, {3.654832137410497*^9, 
+   3.654832148921076*^9}, {3.654832192864552*^9, 3.6548322448982162`*^9}, {
+   3.6548322970968266`*^9, 3.6548323909714637`*^9}, {3.6548324268133087`*^9, 
+   3.6548324630347137`*^9}, {3.6548325274374065`*^9, 3.654832623262909*^9}, {
+   3.654832657290965*^9, 3.6548327133612776`*^9}, {3.654832755526*^9, 
+   3.6548327720889616`*^9}, {3.6548328155857315`*^9, 3.654832847710847*^9}, {
+   3.6548329069957423`*^9, 3.654832926850634*^9}, {3.66466250638957*^9, 
+   3.664662536818391*^9}, {3.664721194486846*^9, 3.664721311388466*^9}, 
+   3.6647232000348473`*^9, {3.6647232635931406`*^9, 3.664723265964739*^9}, {
+   3.6647235855811286`*^9, 3.664723595818124*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["M\[EAcute]todo 2", "Chapter",
+ CellChangeTimes->{{3.664664975639451*^9, 3.664664976911529*^9}}],
+
+Cell["Crear archivo.", "Text",
+ CellChangeTimes->{{3.664676799597975*^9, 3.6646768041978607`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"CreateUncompressed", "[", "\"\<kk.wav\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"audio", "=", " ", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+      "\"\<uncompressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlay", "[", 
+  RowBox[{"audio", ",", 
+   RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", 
+   RowBox[{"SampleDepth", "\[Rule]", "32"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.6646732885095387`*^9, 3.664673292704926*^9}, 
+   3.664675100592798*^9, {3.664723653502313*^9, 3.6647236562302427`*^9}}],
+
+Cell["Comprimir", "Text",
+ CellChangeTimes->{{3.6646768128855333`*^9, 3.6646768144934807`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"CompressMethod2", "[", "every_", "]"}], ":=", " ", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "audio", ",", "samplesize", ",", "samples", ",", "fouriersamples", ",", 
+       "compressedaudio"}], "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"audio", "=", " ", 
+       RowBox[{"BinaryReadList", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+          "\"\<uncompressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], ";",
+       "\[IndentingNewLine]", 
+      RowBox[{"samplesize", " ", "=", " ", "samplerate"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"samples", " ", "=", " ", 
+       RowBox[{"Partition", "[", 
+        RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"fouriersamples", " ", "=", " ", 
+       RowBox[{"ParallelTable", "[", 
+        RowBox[{
+         RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "samples"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"fouriersamples", " ", "=", " ", 
+       RowBox[{"fouriersamples", "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", 
+          RowBox[{"1", ";;", 
+           RowBox[{"-", "1"}], ";;", "every"}]}], "]"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"compressedaudio", " ", "=", " ", 
+       RowBox[{"Flatten", "[", "fouriersamples", "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"WriteFloatList", "[", 
+       RowBox[{"compressedaudio", ",", 
+        RowBox[{"path", "<>", "\"\<compressed.bin\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Print", "[", 
+       RowBox[{"\"\<La tasa de compresi\[OAcute]n es: \>\"", " ", "<>", " ", 
+        RowBox[{"ToString", "[", 
+         RowBox[{"N", "[", 
+          RowBox[{
+           RowBox[{"Length", "[", "compressedaudio", "]"}], "/", 
+           RowBox[{"Length", "[", "audio", "]"}]}], "]"}], "]"}]}], "]"}], 
+      ";"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CompressMethod2", "[", "10", "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6646724611924963`*^9, 3.664672461464106*^9}, {
+   3.664673319301448*^9, 3.664673360736236*^9}, {3.664673434174818*^9, 
+   3.664673441107649*^9}, {3.664674031027529*^9, 3.664674031120261*^9}, {
+   3.664674071414913*^9, 3.664674073182506*^9}, {3.664675179873548*^9, 
+   3.664675182291297*^9}, {3.664675601314693*^9, 3.664675601809615*^9}, {
+   3.6646765177665854`*^9, 3.6646765180533533`*^9}, 3.664723669433671*^9, {
+   3.664723906072977*^9, 3.6647239086902657`*^9}}],
+
+Cell[BoxData["\<\"La tasa de compresi\[OAcute]n es: 0.0970759\"\>"], "Print",
+ CellChangeTimes->{3.664672025038225*^9, 3.6646724189193573`*^9, 
+  3.664673488358577*^9, 3.6646740437374487`*^9, 3.6646740839011106`*^9, 
+  3.6646746110657473`*^9, 3.664675201387385*^9, 3.664675611870181*^9, 
+  3.664676529016437*^9, 3.664678564621664*^9, 3.664723882420053*^9, 
+  3.6647239173935957`*^9}]
+}, Open  ]],
+
+Cell["Descomprimir", "Text",
+ CellChangeTimes->{{3.664676818853716*^9, 3.664676821973386*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Intercalar", "[", 
+    RowBox[{"list_", ",", "every_"}], "]"}], ":=", " ", 
+   RowBox[{"Flatten", "[", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Riffle", "[", 
+        RowBox[{"list", ",", "y"}], "]"}], "/.", " ", 
+       RowBox[{"y", "\[Rule]", 
+        RowBox[{"ConstantArray", "[", 
+         RowBox[{"0", ",", "every"}], "]"}]}]}], ",", 
+      RowBox[{"ConstantArray", "[", 
+       RowBox[{"0", ",", "every"}], "]"}]}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"DecompressMethod2", "[", "every_", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "audio", ",", "compressedsamples", ",", "samples", ",", 
+       "restoredaudio"}], "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"audio", "=", " ", 
+       RowBox[{"BinaryReadList", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+          "\"\<compressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"compressedsamples", " ", "=", " ", 
+       RowBox[{"Partition", "[", 
+        RowBox[{"audio", ",", 
+         RowBox[{"samplerate", "/", "every"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"samples", " ", "=", " ", 
+       RowBox[{"ParallelTable", "[", 
+        RowBox[{
+         RowBox[{"FourierDCT", "[", 
+          RowBox[{"Intercalar", "[", 
+           RowBox[{"i", ",", 
+            RowBox[{"every", "-", "1"}]}], "]"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "compressedsamples"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"restoredaudio", " ", "=", " ", 
+       RowBox[{"Flatten", "[", "samples", "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Print", "[", 
+       RowBox[{"ListPlay", "[", 
+        RowBox[{"restoredaudio", ",", " ", 
+         RowBox[{"SampleRate", "\[Rule]", "samplerate"}]}], "]"}], "]"}], 
+      ";"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DecompressMethod2", "[", "10", "]"}]}], "Input",
+ CellChangeTimes->{
+  3.6646723475515842`*^9, {3.664672725527939*^9, 3.664672776127984*^9}, {
+   3.664673465227812*^9, 3.664673510701564*^9}, {3.664673954881114*^9, 
+   3.664674028209675*^9}, {3.664674118822542*^9, 3.6646741193538857`*^9}, {
+   3.664674722597794*^9, 3.664674745283511*^9}, {3.6646748598822737`*^9, 
+   3.664674956231564*^9}, 3.66467520864671*^9, {3.664675458790524*^9, 
+   3.664675472516448*^9}, 3.664675608107542*^9, 3.664676456005396*^9, {
+   3.6646765395108013`*^9, 3.664676539770396*^9}, 3.664723691820088*^9}],
+
+Cell["Espectrograma", "Text",
+ CellChangeTimes->{{3.6646768278295813`*^9, 3.66467683036534*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"every", " ", "=", " ", "10"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Intercalar", "[", 
+    RowBox[{"list_", ",", "every_"}], "]"}], ":=", " ", 
+   RowBox[{"Flatten", "[", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Riffle", "[", 
+        RowBox[{"list", ",", "y"}], "]"}], "/.", " ", 
+       RowBox[{"y", "\[Rule]", 
+        RowBox[{"ConstantArray", "[", 
+         RowBox[{"0", ",", "every"}], "]"}]}]}], ",", 
+      RowBox[{"ConstantArray", "[", 
+       RowBox[{"0", ",", "every"}], "]"}]}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"audio", " ", "=", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+      "\"\<uncompressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"compressedaudio", " ", "=", " ", 
+   RowBox[{"BinaryReadList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+      "\"\<compressed.bin\>\""}], ",", "\"\<Real32\>\""}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"compressedsamples", " ", "=", " ", 
+   RowBox[{"Partition", "[", 
+    RowBox[{"audio", ",", 
+     RowBox[{"samplerate", "/", "every"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"compressedsamples", " ", "=", " ", 
+   RowBox[{"ParallelTable", "[", 
+    RowBox[{
+     RowBox[{"FourierDCT", "[", 
+      RowBox[{"Intercalar", "[", 
+       RowBox[{"i", ",", 
+        RowBox[{"every", "-", "1"}]}], "]"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "compressedsamples"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samples", " ", "=", " ", 
+   RowBox[{"Partition", "[", 
+    RowBox[{"audio", ",", " ", "samplerate"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"Plot", ",", "ListPlot", ",", "ListLinePlot"}], "}"}], ",", 
+    RowBox[{"BaseStyle", "\[Rule]", 
+     RowBox[{"FontSize", "\[Rule]", "14"}]}]}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Print", "[", 
+    RowBox[{"Periodogram", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"samples", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], ",", 
+        RowBox[{"compressedsamples", "[", 
+         RowBox[{"[", "1", "]"}], "]"}]}], "}"}], ",", 
+      RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", 
+      RowBox[{"Frame", "\[Rule]", "True"}], ",", " ", 
+      RowBox[{"GridLines", "\[Rule]", "Automatic"}], ",", " ", 
+      RowBox[{"FrameLabel", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Frecuencia (Hz)\>\"", ",", " ", "\"\<Intensidad\>\""}], 
+        "}"}]}], ",", 
+      RowBox[{"PlotLegends", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Original\>\"", ",", " ", "\"\<Comprimido\>\""}], 
+        "}"}]}]}], "]"}], "]"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Print", "[", 
+    RowBox[{"Spectrogram", "[", 
+     RowBox[{
+      RowBox[{"Flatten", "[", "samples", "]"}], ",", 
+      RowBox[{"ColorFunction", "\[Rule]", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Blend", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"White", ",", "Orange", ",", "Red", ",", "Black"}], "}"}],
+            ",", "#"}], "]"}], "&"}], ")"}]}], ",", 
+      RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", " ", 
+      RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+      RowBox[{"FrameLabel", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<t\>\"", ",", " ", "\"\<Frecuencia (Hz)\>\""}], "}"}]}], 
+      ",", 
+      RowBox[{"BaseStyle", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"FontSize", "\[Rule]", "14"}], "}"}]}], ",", " ", 
+      RowBox[{"PlotLabel", "\[Rule]", "\"\<Original\>\""}]}], "]"}], "]"}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"Spectrogram", "[", 
+    RowBox[{
+     RowBox[{"Flatten", "[", "compressedsamples", "]"}], ",", 
+     RowBox[{"ColorFunction", "\[Rule]", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Blend", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"White", ",", "Orange", ",", "Red", ",", "Black"}], "}"}], 
+          ",", "#"}], "]"}], "&"}], ")"}]}], ",", 
+     RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", " ", 
+     RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", 
+     RowBox[{"FrameLabel", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"\"\<t\>\"", ",", " ", "\"\<Frecuencia (Hz)\>\""}], "}"}]}], 
+     ",", 
+     RowBox[{"BaseStyle", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"FontSize", "\[Rule]", "14"}], "}"}]}], ",", 
+     RowBox[{"PlotLabel", "\[Rule]", "\"\<Comprimido\>\""}]}], "]"}], "]"}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.6646723299860888`*^9, 3.664672338324643*^9}, {
+  3.664672369891732*^9, 3.664672393552641*^9}, {3.664674184274601*^9, 
+  3.664674318222351*^9}, {3.664675713865059*^9, 3.664675732168125*^9}, {
+  3.664676577866664*^9, 3.664676610829453*^9}, {3.6646767049263887`*^9, 
+  3.664676705123295*^9}, {3.664723623382268*^9, 3.6647236379603677`*^9}, {
+  3.6647237019168186`*^9, 3.664723749746609*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["M\[EAcute]todo 3", "Chapter",
+ CellChangeTimes->{{3.6647611761485033`*^9, 3.664761178660124*^9}}],
+
+Cell["Crea se\[NTilde]al con audio comprimido.", "Text",
+ CellChangeTimes->{{3.664761456049303*^9, 3.664761463401209*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Obtiene", " ", "la", " ", "distribuci\[OAcute]n", " ", "de", " ", "las", 
+    " ", "frecuencias", " ", "borradas", " ", "y", " ", "realiza", " ", 
+    RowBox[{"ajuste", "."}]}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"threshold", " ", "=", " ", "0.03"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"CreateUncompressed", "[", "\"\<kk.wav\>\"", "]"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"audio", "=", " ", 
+     RowBox[{"BinaryReadList", "[", 
+      RowBox[{
+       RowBox[{"path", "<>", "\"\<uncompressed.bin\>\""}], ",", 
+       "\"\<Real32\>\""}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samplesize", " ", "=", " ", "samplerate"}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"samples", " ", "=", " ", 
+     RowBox[{"Partition", "[", 
+      RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"fouriersamples", " ", "=", " ", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "samples"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"deletedFreq", " ", "=", " ", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"DeleteCases", "[", 
+        RowBox[{
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"fouriersamples", "[", 
+                RowBox[{"[", 
+                 RowBox[{"i", ",", "j"}], "]"}], "]"}], "]"}], "<", 
+              "threshold"}], ",", "j"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"j", ",", "1", ",", 
+             RowBox[{"Length", "[", 
+              RowBox[{"fouriersamples", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], "]"}]}], "}"}]}], "]"}], ",", 
+         "Null"}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "1", ",", 
+         RowBox[{"Length", "[", "fouriersamples", "]"}]}], "}"}]}], "]"}]}], 
+    ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"deletedDist", "=", 
+     RowBox[{"Flatten", "[", "deletedFreq", "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"deltbl", " ", "=", " ", 
+     RowBox[{
+      RowBox[{"ParallelTable", "[", 
+       RowBox[{
+        RowBox[{"Count", "[", 
+         RowBox[{"deletedDist", ",", "i"}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "samplerate"}], "}"}]}], "]"}], "/", 
+      RowBox[{"Length", "[", "samples", "]"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"model", " ", "=", " ", 
+     RowBox[{"1", "-", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", "a"}], " ", "x"}], "]"}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"fit", " ", "=", " ", 
+     RowBox[{"FindFit", "[", 
+      RowBox[{"deltbl", ",", "model", ",", 
+       RowBox[{"{", "a", "}"}], ",", "x"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"modelf", "=", 
+     RowBox[{"Function", "[", 
+      RowBox[{
+       RowBox[{"{", "x", "}"}], ",", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"model", "/.", "fit"}], "]"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"freqThreshold", " ", "=", " ", 
+     RowBox[{"Quiet", "[", 
+      RowBox[{
+       RowBox[{"NSolve", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"modelf", "[", "x", "]"}], " ", "\[Equal]", " ", "0.5"}], 
+         ",", "x"}], "]"}], "[", 
+       RowBox[{"[", 
+        RowBox[{"1", ",", "1", ",", "2"}], "]"}], "]"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{"Comprimir", " ", "audio"}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"newFourierSamples", " ", "=", " ", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"DeleteCases", "[", 
+        RowBox[{
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"Abs", "[", 
+                 RowBox[{"j", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], "]"}], ">", "threshold"}], 
+               ")"}], " ", "||", " ", 
+              RowBox[{"(", 
+               RowBox[{"i", " ", "\[LessEqual]", " ", "freqThreshold"}], 
+               ")"}]}], ",", 
+             RowBox[{"j", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], ",", "Null"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "1", ",", 
+             RowBox[{"Length", "[", "j", "]"}]}], "}"}]}], "]"}], ",", 
+         "Null"}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"j", ",", "fouriersamples"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Print", "[", 
+     RowBox[{"\"\<La tasa de compresi\[OAcute]n es: \>\"", " ", "<>", " ", 
+      RowBox[{"ToString", "[", 
+       RowBox[{"N", "[", 
+        RowBox[{
+         RowBox[{"Length", "[", 
+          RowBox[{"Flatten", "[", "newFourierSamples", " ", "]"}], "]"}], "/", 
+         RowBox[{"Length", "[", "audio", "]"}]}], "]"}], "]"}]}], "]"}], 
+    ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.6647615046404667`*^9, 3.664761549474554*^9}, {
+  3.6647629419136753`*^9, 3.664762945396407*^9}}],
+
+Cell[BoxData["\<\"La tasa de compresi\[OAcute]n es: 0.189234\"\>"], "Print",
+ CellChangeTimes->{3.6647627324687233`*^9, 3.664762991110469*^9}]
+}, Open  ]],
+
+Cell["Reconstruye la se\[NTilde]al comprimida.", "Text",
+ CellChangeTimes->{{3.664761473473089*^9, 3.6647614831610394`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"NextDigit", "[", 
+    RowBox[{"f_", ",", "i_"}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"f", " ", ">", " ", "freqThreshold"}], ")"}], "&&", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"RandomVariate", "[", 
+            RowBox[{"BinomialDistribution", "[", 
+             RowBox[{"1", ",", 
+              RowBox[{"modelf", "[", "f", "]"}]}], "]"}], "]"}], "\[Equal]", 
+           "1"}], ")"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Return", "[", "0", "]"}], ";"}], ",", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"j", "\[LessEqual]", " ", 
+            RowBox[{"Length", "[", 
+             RowBox[{"newFourierSamples", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], "]"}]}], ",", 
+           "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"j", "++"}], ";", "\[IndentingNewLine]", 
+            RowBox[{"Return", "[", 
+             RowBox[{"newFourierSamples", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", 
+                RowBox[{"j", "-", "1"}]}], "]"}], "]"}], "]"}], ";"}], ",", 
+           "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"Return", "[", "Null", "]"}], ";"}]}], 
+          "\[IndentingNewLine]", "]"}], ";"}]}], "\[IndentingNewLine]", "]"}],
+       ";"}]}], "\[IndentingNewLine]", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"restoredsamples", " ", "=", " ", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Monitor", "[", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Do", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"j", " ", "=", " ", "1"}], ";", "\[IndentingNewLine]", 
+        RowBox[{"reconstructedsample", "=", " ", 
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"NextDigit", "[", 
+            RowBox[{"f", ",", "i"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"f", ",", "1", ",", "samplerate"}], "}"}]}], "]"}]}], ";",
+         "\[IndentingNewLine]", 
+        RowBox[{"reconstructedsample", " ", "=", " ", 
+         RowBox[{"DeleteCases", "[", 
+          RowBox[{"reconstructedsample", ",", "Null"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"padding", " ", "=", " ", 
+         RowBox[{"ConstantArray", "[", 
+          RowBox[{"0", ",", 
+           RowBox[{"{", 
+            RowBox[{"samplerate", "-", 
+             RowBox[{"Length", "[", "reconstructedsample", "]"}]}], "}"}]}], 
+          "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"reconstructedsample", " ", "=", " ", 
+         RowBox[{"Join", "[", 
+          RowBox[{"reconstructedsample", ",", "padding"}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"AppendTo", "[", 
+         RowBox[{"restoredsamples", ",", " ", "reconstructedsample"}], "]"}], 
+        ";"}], "\[IndentingNewLine]", ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "1", ",", 
+         RowBox[{"Length", "[", "newFourierSamples", "]"}]}], "}"}]}], 
+      "\[IndentingNewLine]", "]"}], ";"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Row", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"ProgressIndicator", "[", 
+         RowBox[{"i", ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", 
+            RowBox[{"Length", "[", "newFourierSamples", "]"}]}], "}"}]}], 
+         "]"}], ",", "i"}], "}"}], ",", "\"\< \>\""}], "]"}]}], "\n", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"samples", " ", "=", " ", 
+   RowBox[{"ParallelTable", "[", 
+    RowBox[{
+     RowBox[{"FourierDCT", "[", "i", "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "restoredsamples"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"restoredaudio", " ", "=", " ", 
+   RowBox[{"Flatten", "[", "samples", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"ListPlay", "[", 
+    RowBox[{"restoredaudio", ",", " ", 
+     RowBox[{"SampleRate", "\[Rule]", "samplerate"}]}], "]"}], "]"}], 
+  ";"}]}], "Input"],
+
+Cell["Visualizaci\[OAcute]n del espectro", "Text",
+ CellChangeTimes->{{3.664763484493723*^9, 3.664763489285804*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"Plot", ",", "ListPlot", ",", "ListLinePlot"}], "}"}], ",", 
+    RowBox[{"BaseStyle", "\[Rule]", 
+     RowBox[{"FontSize", "\[Rule]", "14"}]}]}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"origsamples", " ", "=", 
+    RowBox[{"Partition", "[", 
+     RowBox[{"audio", ",", " ", "samplesize"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Print", "[", 
+    RowBox[{"Periodogram", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"origsamples", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], ",", 
+        RowBox[{"samples", "[", 
+         RowBox[{"[", "1", "]"}], "]"}]}], "}"}], ",", 
+      RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", 
+      RowBox[{"Frame", "\[Rule]", "True"}], ",", " ", 
+      RowBox[{"GridLines", "\[Rule]", "Automatic"}], ",", " ", 
+      RowBox[{"FrameLabel", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Frecuencia (Hz)\>\"", ",", " ", "\"\<Intensidad\>\""}], 
+        "}"}]}], ",", 
+      RowBox[{"PlotLegends", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Original\>\"", ",", " ", "\"\<Comprimido\>\""}], 
+        "}"}]}]}], "]"}], "]"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Print", "[", 
+    RowBox[{"Spectrogram", "[", 
+     RowBox[{"audio", ",", 
+      RowBox[{"ColorFunction", "\[Rule]", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"Blend", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"White", ",", "Orange", ",", "Red", ",", "Black"}], "}"}],
+            ",", "#"}], "]"}], "&"}], ")"}]}], ",", 
+      RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", " ", 
+      RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", " ", 
+      RowBox[{"FrameLabel", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"\"\<t\>\"", ",", " ", "\"\<Frecuencia (Hz)\>\""}], "}"}]}], 
+      ",", 
+      RowBox[{"BaseStyle", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"FontSize", "\[Rule]", "14"}], "}"}]}], ",", " ", 
+      RowBox[{"PlotLabel", "\[Rule]", "\"\<Original\>\""}]}], "]"}], "]"}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{"Spectrogram", "[", 
+    RowBox[{
+     RowBox[{"Flatten", "[", "samples", "]"}], ",", 
+     RowBox[{"ColorFunction", "\[Rule]", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Blend", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"White", ",", "Orange", ",", "Red", ",", "Black"}], "}"}], 
+          ",", "#"}], "]"}], "&"}], ")"}]}], ",", 
+     RowBox[{"SampleRate", "\[Rule]", "samplerate"}], ",", " ", 
+     RowBox[{"ImageSize", "\[Rule]", "Large"}], ",", 
+     RowBox[{"FrameLabel", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"\"\<t\>\"", ",", " ", "\"\<Frecuencia (Hz)\>\""}], "}"}]}], 
+     ",", 
+     RowBox[{"BaseStyle", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"FontSize", "\[Rule]", "14"}], "}"}]}], ",", 
+     RowBox[{"PlotLabel", "\[Rule]", "\"\<Comprimido\>\""}]}], "]"}], "]"}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.664763494016185*^9, 3.664763495240876*^9}, {
+  3.664763574262929*^9, 3.6647636501945753`*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1265, 805},
+WindowMargins->{{Automatic, 128}, {Automatic, -4}},
+FrontEndVersion->"10.1 for Linux x86 (64-bit) (March 23, 2015)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 132, 1, 102, "Title"],
+Cell[CellGroupData[{
+Cell[737, 27, 145, 1, 49, "Subsection"],
+Cell[885, 30, 326, 6, 59, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1248, 41, 107, 1, 73, "Chapter"],
+Cell[1358, 44, 1880, 47, 286, "Input",
+ InitializationCell->True]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3275, 96, 132, 1, 73, "Chapter"],
+Cell[3410, 99, 1410, 40, 186, "Input"],
+Cell[4823, 141, 1799, 52, 236, "Input"],
+Cell[6625, 195, 3098, 82, 311, "Input"],
+Cell[9726, 279, 2211, 59, 236, "Input"],
+Cell[CellGroupData[{
+Cell[11962, 342, 2114, 59, 211, "Input"],
+Cell[14079, 403, 167, 2, 25, "Print"]
+}, Open  ]],
+Cell[14261, 408, 4706, 117, 686, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19004, 530, 140, 1, 73, "Chapter"],
+Cell[19147, 533, 177, 4, 35, "Text"],
+Cell[19327, 539, 659, 11, 35, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20023, 555, 117, 1, 73, "Chapter"],
+Cell[20143, 558, 189, 4, 35, "Text"],
+Cell[20335, 564, 642, 15, 61, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21014, 584, 129, 1, 73, "Chapter"],
+Cell[21146, 587, 459, 7, 83, "Text"],
+Cell[CellGroupData[{
+Cell[21630, 598, 3014, 66, 286, "Input"],
+Cell[24647, 666, 199, 3, 25, "Print"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[24895, 675, 131, 1, 73, "Chapter"],
+Cell[25029, 678, 319, 5, 59, "Text"],
+Cell[25351, 685, 2335, 52, 236, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27723, 742, 171, 2, 73, "Chapter"],
+Cell[27897, 746, 205, 4, 35, "Text"],
+Cell[28105, 752, 5421, 136, 461, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[33563, 893, 101, 1, 73, "Chapter"],
+Cell[33667, 896, 98, 1, 35, "Text"],
+Cell[33768, 899, 697, 17, 86, "Input"],
+Cell[34468, 918, 95, 1, 35, "Text"],
+Cell[CellGroupData[{
+Cell[34588, 923, 2713, 61, 286, "Input"],
+Cell[37304, 986, 383, 5, 25, "Print"]
+}, Open  ]],
+Cell[37702, 994, 94, 1, 35, "Text"],
+Cell[37799, 997, 2698, 64, 236, "Input"],
+Cell[40500, 1063, 96, 1, 35, "Text"],
+Cell[40599, 1066, 5350, 142, 436, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[45986, 1213, 103, 1, 73, "Chapter"],
+Cell[46092, 1216, 122, 1, 35, "Text"],
+Cell[CellGroupData[{
+Cell[46239, 1221, 5504, 152, 561, "Input"],
+Cell[51746, 1375, 142, 1, 25, "Print"]
+}, Open  ]],
+Cell[51903, 1379, 124, 1, 35, "Text"],
+Cell[52030, 1382, 4335, 112, 661, "Input"],
+Cell[56368, 1496, 116, 1, 35, "Text"],
+Cell[56487, 1499, 3310, 87, 286, "Input"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
