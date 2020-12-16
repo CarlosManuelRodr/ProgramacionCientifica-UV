@@ -1,0 +1,11 @@
+1. FreewayAC:
+    - Implementar variacion del modelo, por ejemplo, soporte para 2 o más carriles.
+    - Estudiar el efecto de la introducción de vehículos autónomos (Sin aleatorización y con aceleración instantánea)
+2. Eigenestados2D:
+    - Crear algoritmo general que funcione para cualquier base (Funciones de Bessel, y demás).
+3. ??
+4. Crear algoritmo sintetizador en tiempo real del modelo de inducción electromagnética en guitarra eléctrica.
+5. ??
+6. ??
+7. ??
+8. ??
